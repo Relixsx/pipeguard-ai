@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────────────────────────
+#  PipeGuard AI v2 — Python Dependencies
+#  Install:  pip install -r requirements.txt
+# ─────────────────────────────────────────────────────────────
+
+# Web framework
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+
+# Deep learning (CPU build)
+torch==2.2.2
+
+# Data
+numpy==1.26.4
+pandas==2.2.1
+
+# Validation
+pydantic==2.6.4
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+
+# Database
+sqlalchemy==2.0.29
+
+# Rate limiting
+slowapi==0.1.9
+
+# Environment
+python-dotenv==1.0.1
+python-multipart==0.0.9

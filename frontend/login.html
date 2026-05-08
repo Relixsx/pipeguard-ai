@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PipeGuard AI — Secure Access</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy-900:#060d1a;
+  --navy-800:#091222;
+  --navy-700:#0c192e;
+  --navy-600:#10223d;
+  --navy-500:#162c4f;
+  --gold:#c8962e;
+  --gold-light:#e0b44a;
+  --safe:#1db87c;
+  --alert:#d94040;
+  --white:#f0f4f8;
+  --text:#c8d8e8;
+  --text2:#6e8ba8;
+  --text3:#3a5470;
+  --line:rgba(255,255,255,0.07);
+  --line2:rgba(255,255,255,0.12);
+  --sans:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{
+  background:var(--navy-900);
+  color:var(--text);font-family:var(--sans);
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 480px;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(200,150,46,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,150,46,0.025) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+/* Left panel — branding */
+.brand-panel{
+  background:linear-gradient(160deg,var(--navy-800) 0%,var(--navy-900) 100%);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:3rem;position:relative;overflow:hidden;
+}
+.brand-panel::before{
+  content:'';position:absolute;top:-100px;left:-100px;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,150,46,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.brand-header{position:relative;z-index:1}
+.brand-emblem{
+  width:60px;height:60px;border-radius:6px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:1.6rem;
+  color:var(--navy-900);font-weight:800;margin-bottom:1.5rem;
+}
+.brand-name{
+  font-family:var(--display);font-size:2.8rem;
+  color:var(--white);letter-spacing:0.12em;line-height:1;
+}
+.brand-name span{color:var(--gold)}
+.brand-tagline{
+  font-size:0.85rem;color:var(--text2);margin-top:0.6rem;
+  font-weight:300;line-height:1.6;max-width:320px;
+}
+.brand-features{margin-top:2.5rem;display:flex;flex-direction:column;gap:0.9rem}
+.feat-item{
+  display:flex;align-items:flex-start;gap:0.75rem;
+  padding:0.75rem;background:var(--navy-700);
+  border:1px solid var(--line);border-radius:4px;
+  border-left:3px solid var(--gold);
+}
+.feat-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.feat-text{}
+.feat-title{font-size:0.82rem;font-weight:600;color:var(--white);letter-spacing:0.02em}
+.feat-desc{font-size:0.72rem;color:var(--text2);margin-top:2px;line-height:1.5}
+.brand-footer{
+  font-family:var(--mono);font-size:0.55rem;color:var(--text3);
+  letter-spacing:0.12em;line-height:1.8;position:relative;z-index:1;
+}
+.brand-footer a{color:var(--text3);text-decoration:none}
+
+/* Right panel — login */
+.login-panel{
+  background:var(--navy-800);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:3rem;position:relative;
+}
+.login-panel::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--gold),transparent);
+}
+.login-header{margin-bottom:2.5rem}
+.login-overline{
+  font-family:var(--mono);font-size:0.55rem;color:var(--gold);
+  letter-spacing:0.22em;margin-bottom:0.5rem;
+}
+.login-title{
+  font-family:var(--display);font-size:2rem;
+  color:var(--white);letter-spacing:0.1em;line-height:1;
+}
+.login-sub{font-size:0.78rem;color:var(--text2);margin-top:0.5rem;font-weight:300}
+
+.form-field{margin-bottom:1.1rem}
+.f-label{
+  display:block;font-family:var(--mono);font-size:0.55rem;
+  color:var(--text3);letter-spacing:0.16em;margin-bottom:0.4rem;
+}
+.f-input{
+  width:100%;background:var(--navy-700);
+  border:1px solid var(--line2);border-radius:2px;
+  padding:0.7rem 0.9rem;color:var(--white);
+  font-family:var(--mono);font-size:0.88rem;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.f-input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(200,150,46,0.1);
+}
+.f-input::placeholder{color:var(--text3)}
+
+.btn-login{
+  width:100%;background:var(--gold);color:var(--navy-900);border:none;
+  border-radius:2px;padding:0.8rem;
+  font-family:var(--display);font-size:1.1rem;letter-spacing:0.15em;
+  cursor:pointer;transition:background 0.2s;margin-top:0.4rem;
+  display:flex;align-items:center;justify-content:center;gap:0.5rem;
+}
+.btn-login:hover{background:var(--gold-light)}
+.btn-login:disabled{background:var(--navy-500);color:var(--text3);cursor:not-allowed}
+.spinner{
+  width:14px;height:14px;border:2px solid rgba(6,13,26,0.3);
+  border-top-color:var(--navy-900);border-radius:50%;
+  animation:spin 0.6s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.err-box{
+  background:rgba(217,64,64,0.08);border:1px solid rgba(217,64,64,0.25);
+  border-left:3px solid var(--alert);border-radius:2px;
+  padding:0.6rem 0.9rem;font-family:var(--mono);font-size:0.68rem;
+  color:var(--alert);margin-top:0.75rem;display:none;
+}
+.err-box.show{display:block}
+
+.login-footer{
+  margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:0.55rem;color:var(--text3);
+  letter-spacing:0.1em;line-height:2;
+}
+@media(max-width:768px){
+  body{grid-template-columns:1fr}
+  .brand-panel{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Brand Panel -->
+<div class="brand-panel">
+  <div class="brand-header">
+    <div class="brand-emblem">PG</div>
+    <div class="brand-name">PipeGuard <span>AI</span></div>
+    <div class="brand-tagline">
+      AI-powered pipeline integrity management system for Nigeria's petroleum sector.
+      Detects leaks, surges, blockages and degradation in real time using deep learning anomaly detection.
+    </div>
+    <div class="brand-features">
+      <div class="feat-item">
+        <div class="feat-icon">🧠</div>
+        <div class="feat-text">
+          <div class="feat-title">LSTM Autoencoder Model</div>
+          <div class="feat-desc">Trained on 5,694 real SCADA readings. Detects anomalies via reconstruction error analysis.</div>
+        </div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">📡</div>
+        <div class="feat-text">
+          <div class="feat-title">Real-Time Stream Processing</div>
+          <div class="feat-desc">Server-Sent Events at 1 Hz. Live pressure, flow and temperature monitoring with instant alerting.</div>
+        </div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">🛡</div>
+        <div class="feat-text">
+          <div class="feat-title">JWT Authentication &amp; Audit Trail</div>
+          <div class="feat-desc">Role-based access control. All events logged to SQLite with acknowledgement workflow.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="brand-footer">
+    PIPEGUARD AI v2.0.0 · NNPC / PTDF SECTOR 07<br>
+    WARRI–KADUNA PIPELINE · NPN-GRID-07<br>
+    AUTHORISED ACCESS ONLY · © 2024
+  </div>
+</div>
+
+<!-- Login Panel -->
+<div class="login-panel">
+  <div class="login-header">
+    <div class="login-overline">SECURE OPERATOR ACCESS</div>
+    <div class="login-title">SIGN IN</div>
+    <div class="login-sub">Enter your credentials to access the monitoring dashboard</div>
+  </div>
+
+  <div class="form-field">
+    <label class="f-label">OPERATOR USERNAME</label>
+    <input class="f-input" type="text" id="username" placeholder="Enter username" autocomplete="username"/>
+  </div>
+  <div class="form-field">
+    <label class="f-label">PASSWORD</label>
+    <input class="f-input" type="password" id="password" placeholder="Enter password" autocomplete="current-password"/>
+  </div>
+
+  <button class="btn-login" id="btnLogin">SIGN IN</button>
+  <div class="err-box" id="errBox"></div>
+
+  <div class="login-footer">
+    DEFAULT CREDENTIALS: admin / PipeGuard2024!<br>
+    SYSTEM: LSTM AUTOENCODER · FASTAPI · SQLITE<br>
+    CONTACT: PIPELINE OPERATIONS CENTRE
+  </div>
+</div>
+
+<script>
+const API="http://127.0.0.1:8000";
+if(localStorage.getItem("pipeguard_token")) location.href="index.html";
+const btn=$=>document.getElementById($);
+
+function showErr(msg){const e=btn("errBox");e.textContent="⚠ "+msg;e.classList.add("show");}
+function hideErr(){btn("errBox").classList.remove("show");}
+function setLoading(on){
+  btn("btnLogin").disabled=on;
+  btn("btnLogin").innerHTML=on?'<span class="spinner"></span>AUTHENTICATING…':'SIGN IN';
+}
+async function doLogin(){
+  hideErr();
+  const u=btn("username").value.trim(),p=btn("password").value;
+  if(!u||!p){showErr("Enter both username and password.");return;}
+  setLoading(true);
+  try{
+    const form=new URLSearchParams();form.append("username",u);form.append("password",p);
+    const r=await fetch(`${API}/auth/login`,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+    if(!r.ok){const err=await r.json();showErr(err.detail||"Authentication failed.");return;}
+    const d=await r.json();
+    localStorage.setItem("pipeguard_token",d.access_token);
+    localStorage.setItem("pipeguard_username",d.username);
+    localStorage.setItem("pipeguard_role",d.role);
+    localStorage.setItem("pipeguard_full_name",d.full_name||d.username);
+    location.href="index.html";
+  }catch{showErr("Cannot reach server. Is the API running on port 8000?");}
+  finally{setLoading(false);}
+}
+btn("btnLogin").addEventListener("click",doLogin);
+btn("password").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+btn("username").addEventListener("keydown",e=>{if(e.key==="Enter")btn("password").focus();});
+</script>
+</body>
+</html>

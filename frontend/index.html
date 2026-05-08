@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PipeGuard AI — Pipeline Integrity Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   PIPEGUARD AI — Enterprise PTDF Presentation Theme
+   Aesthetic: Deep Navy · Gold · Refined Industrial
+═══════════════════════════════════════════════════ */
+:root{
+  --navy-900:#060d1a;
+  --navy-800:#091222;
+  --navy-700:#0c192e;
+  --navy-600:#10223d;
+  --navy-500:#162c4f;
+  --navy-400:#1e3a64;
+  --gold:#c8962e;
+  --gold-light:#e0b44a;
+  --gold-pale:rgba(200,150,46,0.12);
+  --safe:#1db87c;
+  --safe-pale:rgba(29,184,124,0.12);
+  --warn:#e8a020;
+  --warn-pale:rgba(232,160,32,0.12);
+  --alert:#d94040;
+  --alert-pale:rgba(217,64,64,0.12);
+  --white:#f0f4f8;
+  --text:#c8d8e8;
+  --text2:#6e8ba8;
+  --text3:#3a5470;
+  --line:rgba(255,255,255,0.07);
+  --line2:rgba(255,255,255,0.12);
+  --sans:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;-webkit-font-smoothing:antialiased}
+body{
+  background:var(--navy-900);
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
+/* Subtle grid texture */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.4;
+  background-image:
+    linear-gradient(rgba(200,150,46,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,150,46,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--navy-900)}
+::-webkit-scrollbar-thumb{background:var(--navy-500);border-radius:2px}
+
+/* ── INSTITUTIONAL HEADER ── */
+.inst-header{
+  background:var(--navy-800);
+  border-bottom:2px solid var(--gold);
+  padding:0 2rem;
+  display:flex;align-items:stretch;
+  position:relative;z-index:10;
+}
+.inst-logo{
+  display:flex;align-items:center;gap:1rem;
+  padding:0.75rem 0;border-right:1px solid var(--line2);
+  padding-right:1.5rem;margin-right:1.5rem;
+}
+.logo-emblem{
+  width:44px;height:44px;border-radius:4px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;font-weight:800;color:var(--navy-900);
+  font-family:var(--display);letter-spacing:0.05em;
+}
+.logo-text-wrap{}
+.logo-main{
+  font-family:var(--display);font-size:1.35rem;letter-spacing:0.12em;
+  color:var(--white);line-height:1;
+}
+.logo-sub{
+  font-family:var(--mono);font-size:0.55rem;color:var(--gold);
+  letter-spacing:0.18em;margin-top:2px;
+}
+.inst-meta{
+  flex:1;display:flex;align-items:center;gap:2.5rem;padding:0.5rem 0;
+}
+.meta-item{
+  display:flex;flex-direction:column;gap:2px;
+}
+.meta-label{font-family:var(--mono);font-size:0.56rem;color:#7eb8d4;letter-spacing:0.15em}
+.meta-value{font-family:var(--mono);font-size:0.75rem;color:#c8e0f0;letter-spacing:0.05em}
+.inst-right{
+  display:flex;align-items:center;gap:1rem;
+  border-left:1px solid var(--line2);padding-left:1.5rem;margin-left:auto;
+}
+.sys-time{font-family:var(--mono);font-size:0.85rem;color:#ffffff;letter-spacing:0.1em;font-weight:500}
+.stream-pill{
+  display:flex;align-items:center;gap:0.4rem;
+  font-family:var(--mono);font-size:0.62rem;color:var(--text2);
+  background:var(--navy-700);border:1px solid var(--line2);
+  border-radius:2px;padding:0.25rem 0.65rem;letter-spacing:0.08em;
+}
+.stream-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:background 0.4s}
+.stream-dot.live{background:var(--safe);box-shadow:0 0 6px var(--safe);animation:blink 2.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.user-pill{
+  display:flex;align-items:center;gap:0.5rem;
+  font-family:var(--mono);font-size:0.62rem;color:var(--text2);
+  letter-spacing:0.05em;
+}
+.user-avatar{
+  width:26px;height:26px;border-radius:2px;
+  background:var(--navy-500);border:1px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;font-weight:600;color:var(--gold);
+}
+.btn-signout{
+  width:28px;height:28px;background:none;border:1px solid var(--line2);
+  color:var(--text3);cursor:pointer;border-radius:2px;font-size:0.8rem;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.btn-signout:hover{border-color:var(--alert);color:var(--alert)}
+
+/* ── STATUS BAND ── */
+.status-band{
+  display:flex;align-items:stretch;
+  background:var(--navy-800);
+  border-bottom:1px solid var(--line);
+  position:relative;z-index:9;
+}
+.status-main{
+  display:flex;align-items:center;gap:1.5rem;
+  padding:1rem 2rem;border-right:1px solid var(--line);
+  min-width:340px;
+}
+.status-indicator{
+  width:16px;height:56px;border-radius:3px;
+  background:var(--safe);flex-shrink:0;
+  box-shadow:0 0 16px rgba(29,184,124,0.4);
+  transition:background 0.4s,box-shadow 0.4s;
+}
+.status-text{}
+.st-overline{font-family:var(--mono);font-size:0.6rem;color:#7eb8d4;letter-spacing:0.2em;margin-bottom:0.2rem}
+.st-status{
+  font-family:var(--display);font-size:1.9rem;letter-spacing:0.1em;
+  color:var(--safe);line-height:1;transition:color 0.4s;
+}
+.st-desc{font-size:0.8rem;color:#a8c8e0;margin-top:0.3rem;font-weight:400}
+
+/* Score gauge */
+.score-section{
+  padding:0.9rem 1.75rem;border-right:1px solid var(--line);
+  min-width:280px;display:flex;flex-direction:column;justify-content:center;gap:0.5rem;
+}
+.sc-label{font-family:var(--mono);font-size:0.52rem;color:var(--text3);letter-spacing:0.18em}
+.gauge-track{
+  height:6px;background:var(--navy-600);border-radius:2px;
+  position:relative;overflow:visible;
+}
+.gauge-fill{
+  height:100%;border-radius:2px;width:0%;
+  transition:width 0.5s,background 0.5s;
+  background:linear-gradient(90deg,var(--safe),var(--safe));
+}
+.gauge-thr{
+  position:absolute;top:-4px;width:1.5px;height:14px;
+  background:rgba(255,255,255,0.25);left:66%;
+}
+.gauge-labels{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:0.55rem;color:#7eb8d4;margin-top:3px;
+}
+.sc-value{
+  font-family:var(--mono);font-size:1.15rem;color:var(--white);
+  letter-spacing:0.08em;
+}
+.sc-value span{font-size:0.65rem;color:var(--text3);margin-left:0.3rem}
+
+/* Sensor pills */
+.sensor-strip{
+  display:flex;flex:1;align-items:stretch;
+  overflow:hidden;
+}
+.sensor-block{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:0.75rem 1.5rem;border-right:1px solid var(--line);
+  position:relative;overflow:hidden;transition:background 0.3s;
+}
+.sensor-block::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--sb-color,var(--navy-500));
+  transform:scaleX(var(--sb-scale,0.4));transform-origin:left;
+  transition:transform 0.5s,background 0.4s;
+}
+.sb-label{font-family:var(--mono);font-size:0.58rem;color:#7eb8d4;letter-spacing:0.15em;margin-bottom:0.25rem}
+.sb-value{
+  font-family:var(--mono);font-size:1.6rem;font-weight:500;
+  color:#ffffff;line-height:1;transition:color 0.4s;
+}
+.sb-unit{font-size:0.7rem;color:var(--text3);margin-left:0.2rem;font-weight:300}
+.sb-trend{
+  font-size:0.68rem;margin-top:0.15rem;font-family:var(--mono);
+  color:#a8c8e0;display:flex;align-items:center;gap:0.3rem;
+}
+.trend-arrow{font-size:0.65rem}
+
+/* Counter strip */
+.counter-strip{
+  display:flex;align-items:center;
+  background:var(--navy-700);border-left:1px solid var(--line);
+}
+.ctr{
+  padding:0.75rem 1.25rem;text-align:center;
+  border-right:1px solid var(--line);
+}
+.ctr:last-child{border-right:none}
+.ctr-num{
+  font-family:var(--display);font-size:1.9rem;letter-spacing:0.05em;
+  color:#ffffff;line-height:1;
+}
+.ctr-num.danger{color:var(--alert)}
+.ctr-lbl{
+  font-family:var(--mono);font-size:0.58rem;
+  color:#7eb8d4;letter-spacing:0.15em;margin-top:3px;
+}
+
+/* ── MAIN GRID ── */
+.main-grid{
+  display:grid;
+  grid-template-columns:1fr 300px;
+  grid-template-rows:auto auto;
+  gap:1px;background:var(--line);
+  margin-top:1px;
+  position:relative;z-index:1;
+}
+.chart-primary{
+  background:var(--navy-800);
+  padding:1.25rem 1.5rem;
+  grid-row:1;grid-column:1;
+}
+.chart-secondary{
+  background:var(--navy-800);
+  padding:1.25rem 1.5rem;
+  grid-row:1;grid-column:2;
+}
+.panel-title{
+  font-family:var(--mono);font-size:0.65rem;
+  color:#7eb8d4;letter-spacing:0.2em;
+  display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;
+}
+.panel-title::after{content:'';flex:1;height:1px;background:var(--line)}
+.legend{display:flex;gap:0.75rem;margin-left:auto}
+.leg-item{
+  display:flex;align-items:center;gap:0.35rem;
+  font-family:var(--mono);font-size:0.55rem;color:var(--text3);
+}
+.leg-dot{width:8px;height:2px;border-radius:1px}
+.chart-wrap{position:relative;height:220px}
+.btn-sm{
+  width:24px;height:24px;background:none;border:1px solid var(--line2);
+  color:var(--text3);cursor:pointer;border-radius:2px;font-size:0.75rem;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+  margin-left:auto;
+}
+.btn-sm:hover{border-color:var(--text2);color:var(--text)}
+
+/* ── BOTTOM PANELS ── */
+.bottom-grid{
+  display:grid;grid-template-columns:1fr 1.4fr;
+  gap:1px;background:var(--line);margin-top:1px;
+  position:relative;z-index:1;
+}
+.b-panel{background:var(--navy-800);padding:1.25rem 1.5rem}
+
+/* Form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;margin-bottom:0.65rem}
+.field-full{grid-column:1/-1}
+.f-label{
+  display:block;font-family:var(--mono);font-size:0.52rem;
+  color:var(--text3);letter-spacing:0.12em;margin-bottom:0.3rem;
+}
+.f-input{
+  width:100%;background:var(--navy-700);
+  border:1px solid var(--line2);border-radius:2px;
+  padding:0.5rem 0.7rem;color:var(--white);
+  font-family:var(--mono);font-size:0.82rem;outline:none;
+  transition:border-color 0.2s;
+}
+.f-input:focus{border-color:var(--gold)}
+.f-input::placeholder{color:var(--text3)}
+.btn-analyse{
+  width:100%;background:var(--gold);color:var(--navy-900);
+  border:none;border-radius:2px;padding:0.6rem;
+  font-family:var(--display);font-size:1rem;letter-spacing:0.12em;
+  cursor:pointer;transition:background 0.2s;
+}
+.btn-analyse:hover{background:var(--gold-light)}
+.result-panel{
+  display:none;margin-top:0.75rem;
+  background:var(--navy-700);border:1px solid var(--line2);
+  border-left:3px solid var(--safe);border-radius:0 2px 2px 0;
+  padding:0.65rem 0.9rem;
+}
+.result-panel.show{display:flex;align-items:center;gap:0.75rem}
+.r-icon{font-size:1.3rem}
+.r-status{font-family:var(--display);font-size:1.1rem;letter-spacing:0.1em;flex:1}
+.r-score{font-family:var(--mono);font-size:0.62rem;color:var(--text3)}
+
+/* Sim controls */
+.sim-desc{
+  font-size:0.82rem;color:#a8c8e0;line-height:1.6;
+  margin-bottom:1rem;padding-bottom:1rem;
+  border-bottom:1px solid var(--line);
+}
+.toggle-row{margin-bottom:1rem}
+.tog-label{
+  display:flex;align-items:center;gap:0.6rem;cursor:pointer;
+  font-family:var(--mono);font-size:0.62rem;color:var(--text2);
+  letter-spacing:0.06em;
+}
+.tog-label input{display:none}
+.tog-track{
+  width:36px;height:18px;background:var(--navy-600);
+  border:1px solid var(--line2);border-radius:9px;
+  position:relative;transition:background 0.3s;flex-shrink:0;
+}
+.tog-track::after{
+  content:'';position:absolute;width:12px;height:12px;
+  border-radius:50%;background:var(--text3);top:2px;left:2px;
+  transition:transform 0.3s,background 0.3s;
+}
+.tog-label input:checked+.tog-track{background:rgba(217,64,64,0.2);border-color:var(--alert)}
+.tog-label input:checked+.tog-track::after{transform:translateX(18px);background:var(--alert)}
+.btn-group{display:flex;gap:0.5rem}
+.btn-outline{
+  flex:1;background:none;border:1px solid var(--line2);
+  color:var(--text2);border-radius:2px;padding:0.5rem 0.75rem;
+  font-family:var(--mono);font-size:0.68rem;letter-spacing:0.06em;
+  cursor:pointer;transition:all 0.2s;text-align:center;
+}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Alert log */
+.alert-scroll{
+  max-height:200px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:3px;margin-top:0.6rem;
+}
+.empty-state{
+  padding:1.5rem 0;text-align:center;
+  font-family:var(--mono);font-size:0.65rem;color:#7eb8d4;letter-spacing:0.1em;
+}
+.alert-row{
+  display:flex;align-items:center;gap:0.65rem;
+  padding:0.5rem 0.75rem;
+  background:var(--navy-700);border-radius:2px;
+  border-left:3px solid var(--alert);
+  font-family:var(--mono);font-size:0.62rem;
+  animation:fadeIn 0.25s ease;
+}
+.alert-row.warning{border-left-color:var(--warn)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.ar-dot{width:6px;height:6px;border-radius:50%;background:var(--alert);flex-shrink:0}
+.ar-dot.w{background:var(--warn)}
+.ar-info{flex:1;min-width:0}
+.ar-event{color:#ffffff;font-weight:600;letter-spacing:0.06em;font-size:0.7rem}
+.ar-detail{color:#7eb8d4;font-size:0.6rem;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar-score{color:var(--alert);font-weight:500;flex-shrink:0}
+.ar-score.w{color:var(--warn)}
+.badge-pill{
+  font-family:var(--mono);font-size:0.6rem;padding:3px 9px;
+  background:var(--alert-pale);color:#ff6b6b;
+  border:1px solid rgba(217,64,64,0.4);border-radius:2px;margin-left:auto;
+  font-weight:600;
+}
+
+/* ── MODAL ── */
+.modal-wrap{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  display:none;z-index:500;pointer-events:none;
+  width:480px;
+}
+.modal-wrap.open{display:block;pointer-events:all}
+.modal-box{
+  background:var(--navy-700);
+  border:1px solid rgba(217,64,64,0.5);
+  border-top:3px solid var(--alert);
+  border-radius:4px;
+  overflow:hidden;
+  box-shadow:0 12px 40px rgba(217,64,64,0.2),0 0 0 1px rgba(217,64,64,0.1);
+  animation:slideInCorner 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideInCorner{
+  from{transform:translateX(24px) scale(0.96);opacity:0}
+  to{transform:translateX(0) scale(1);opacity:1}
+}
+/* Red banner header */
+.modal-head{
+  display:flex;align-items:center;gap:0.85rem;
+  background:rgba(217,64,64,0.12);
+  padding:1.1rem 1.25rem;
+  border-bottom:1px solid rgba(217,64,64,0.2);
+}
+.modal-icon{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(217,64,64,0.2);border:1.5px solid var(--alert);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;flex-shrink:0;
+  animation:iconPulse 2s infinite;
+}
+@keyframes iconPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(217,64,64,0.4)}
+  50%{box-shadow:0 0 0 6px rgba(217,64,64,0)}
+}
+.modal-title{
+  font-family:var(--display);font-size:1.6rem;
+  color:var(--alert);letter-spacing:0.12em;flex:1;line-height:1;
+}
+.modal-badge{
+  font-family:var(--mono);font-size:0.6rem;
+  background:var(--alert-pale);color:var(--alert);
+  border:1px solid rgba(217,64,64,0.4);
+  border-radius:2px;padding:3px 7px;letter-spacing:0.1em;
+}
+.modal-close{
+  background:none;border:none;color:var(--text3);
+  cursor:pointer;font-size:1rem;padding:0;
+  line-height:1;transition:color 0.2s;margin-left:4px;
+}
+.modal-close:hover{color:var(--text)}
+/* Body */
+.modal-body{
+  padding:1rem 1.1rem;
+  font-size:0.88rem;color:var(--text2);line-height:1.6;
+}
+.modal-body strong{color:var(--white);font-weight:500}
+.modal-body .alert-val{
+  color:var(--alert);font-family:var(--mono);
+  font-weight:500;font-size:0.82rem;
+}
+/* Footer */
+.modal-footer{
+  display:flex;gap:0;
+  border-top:1px solid var(--line);
+}
+.btn-modal{
+  flex:1;padding:0.75rem;border-radius:0;
+  font-family:var(--display);font-size:1rem;letter-spacing:0.1em;
+  cursor:pointer;transition:all 0.2s;
+  border:none;border-right:1px solid var(--line);
+  background:none;color:var(--text2);
+}
+.btn-modal:last-child{border-right:none}
+.btn-modal:hover{background:rgba(255,255,255,0.04);color:var(--white)}
+.btn-modal.primary{
+  background:var(--alert);color:var(--white);
+}
+.btn-modal.primary:hover{background:#c03030}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:600;
+  background:var(--navy-600);border:1px solid var(--line2);
+  border-left:3px solid var(--gold);border-radius:2px;
+  padding:0.6rem 1rem;font-family:var(--mono);font-size:0.68rem;
+  color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  opacity:0;transform:translateY(8px);
+  transition:opacity 0.22s,transform 0.22s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* State skins */
+body.s-warn .status-indicator{background:var(--warn);box-shadow:0 0 16px rgba(232,160,32,0.4)}
+body.s-warn .st-status{color:var(--warn)}
+body.s-leak .status-indicator{background:var(--alert);box-shadow:0 0 20px rgba(217,64,64,0.5)}
+body.s-leak .st-status{color:var(--alert)}
+body.s-leak .inst-header{border-bottom-color:var(--alert)}
+
+
+
+
+
+/* ── LEGEND BAR ─────────────────────────────────────────── */
+.big-legend{
+  display:flex;align-items:center;justify-content:center;
+  gap:2.5rem;
+  padding:0.65rem 1.5rem;
+  border-top:1px solid var(--line2);
+  background:var(--navy-800);
+}
+.big-leg-item{
+  display:flex;align-items:center;gap:0.75rem;
+}
+.big-leg-sep{display:none}
+.big-leg-line{
+  width:36px;height:4px;
+  border-radius:2px;flex-shrink:0;
+}
+.big-leg-dot{
+  width:12px;height:12px;
+  border-radius:50%;flex-shrink:0;
+}
+.big-leg-label{
+  font-family:var(--display);
+  font-size:1.35rem;
+  letter-spacing:0.14em;
+  color:var(--white);
+  line-height:1;
+}
+.big-leg-unit{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  color:var(--text3);
+  letter-spacing:0.1em;
+  margin-left:0.2rem;
+}
+
+/* ── PROFESSIONAL LEGEND BAR ─────────────────────────────── */
+.pro-legend{
+  display:flex;align-items:center;
+  background:var(--navy-700);
+  border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);
+  padding:0.75rem 1.5rem;
+  gap:0;
+}
+.pro-leg-item{
+  display:flex;align-items:center;gap:0.85rem;
+  padding:0 2rem;flex:1;justify-content:center;
+}
+.pro-leg-item:first-child{padding-left:0}
+.pro-leg-item:last-child{padding-right:0}
+.pro-leg-divider{
+  width:1px;height:32px;
+  background:var(--line2);flex-shrink:0;
+}
+.pro-leg-text{
+  display:flex;flex-direction:column;gap:2px;
+}
+.pro-leg-name{
+  font-family:var(--display);
+  font-size:1.35rem;
+  letter-spacing:0.14em;
+  color:#ffffff;
+  line-height:1;
+}
+.pro-leg-unit{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  color:#7eb8d4;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+}
+
+/* ── BUFFER PROGRESS ─────────────────────────────────────── */
+.buf-status{
+  display:flex;align-items:center;gap:0.75rem;
+  margin-top:0.5rem;padding:0.5rem 0.75rem;
+  background:var(--navy-700);border:1px solid var(--line2);border-radius:2px;
+}
+.buf-bar-wrap{
+  flex:1;height:4px;background:var(--navy-500);
+  border-radius:2px;overflow:hidden;
+}
+.buf-bar-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--safe),var(--gold));
+  border-radius:2px;transition:width 0.3s;
+}
+.buf-text{
+  font-family:var(--mono);font-size:0.62rem;
+  color:#a8c8e0;letter-spacing:0.06em;
+  white-space:nowrap;flex-shrink:0;
+}
+.buf-reset{
+  background:none;border:1px solid var(--line2);
+  color:var(--text3);border-radius:2px;
+  padding:2px 8px;font-family:var(--mono);
+  font-size:0.55rem;letter-spacing:0.1em;
+  cursor:pointer;transition:all 0.2s;flex-shrink:0;
+}
+.buf-reset:hover{border-color:var(--gold);color:var(--gold)}
+</style>
+</head>
+<body>
+
+<!-- INSTITUTIONAL HEADER -->
+<header class="inst-header">
+  <div class="inst-logo">
+    <div class="logo-emblem">PG</div>
+    <div class="logo-text-wrap">
+      <div class="logo-main">PIPEGUARD AI</div>
+      <div class="logo-sub">PIPELINE INTEGRITY MANAGEMENT SYSTEM</div>
+    </div>
+  </div>
+  <div class="inst-meta">
+    <div class="meta-item">
+      <span class="meta-label">OPERATOR</span>
+      <span class="meta-value">NNPC GRID · SECTOR 07</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">PIPELINE ID</span>
+      <span class="meta-value">NPN-GRID-07 / WARRI–KADUNA</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">MODEL</span>
+      <span class="meta-value">CNN-LSTM AUTOENCODER v2.0</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">THRESHOLD</span>
+      <span class="meta-value" id="thresholdDisplay">LOADING…</span>
+    </div>
+  </div>
+  <div class="inst-right">
+    <div class="sys-time" id="clock">--:--:-- UTC</div>
+    <div class="stream-pill">
+      <span class="stream-dot" id="connDot"></span>
+      <span id="connText">CONNECTING</span>
+    </div>
+    <div class="user-pill">
+      <div class="user-avatar" id="userAvatar">OP</div>
+      <span id="usernameDisplay">Operator</span>
+      <span class="meta-label" id="rolePill">OPERATOR</span>
+    </div>
+    <button class="btn-signout" id="btnLogout" title="Sign out">⏻</button>
+  </div>
+</header>
+
+<!-- STATUS BAND -->
+<div class="status-band">
+  <div class="status-main">
+    <div class="status-indicator" id="statusBar"></div>
+    <div class="status-text">
+      <div class="st-overline">PIPELINE STATUS</div>
+      <div class="st-status" id="heroStatus">NORMAL OPERATION</div>
+      <div class="st-desc" id="heroSub">All sensors within certified operating range</div>
+    </div>
+  </div>
+
+  <div class="score-section">
+    <div class="sc-label">ANOMALY RECONSTRUCTION ERROR</div>
+    <div class="gauge-track">
+      <div class="gauge-fill" id="gaugeBarFill"></div>
+      <div class="gauge-thr"></div>
+    </div>
+    <div class="gauge-labels"><span>0.000</span><span>LOW RISK</span><span>THRESHOLD</span><span>CRITICAL</span></div>
+    <div class="sc-value" id="scoreValue">0.000000 <span>MSE</span></div>
+  </div>
+
+  <div class="sensor-strip">
+    <div class="sensor-block" style="--sb-color:var(--safe)">
+      <div class="sb-label">LINE PRESSURE</div>
+      <div class="sb-value"><span id="metricPressure">—</span><span class="sb-unit">bar</span></div>
+      <div class="sb-trend"><span class="trend-arrow" id="trendP">→</span><span id="trendPText" style="color:var(--text3)">Stable</span></div>
+    </div>
+    <div class="sensor-block" style="--sb-color:var(--gold)">
+      <div class="sb-label">VOLUMETRIC FLOW</div>
+      <div class="sb-value"><span id="metricFlow">—</span><span class="sb-unit">m³/h</span></div>
+      <div class="sb-trend"><span class="trend-arrow" id="trendF">→</span><span id="trendFText" style="color:var(--text3)">Nominal</span></div>
+    </div>
+    <div class="sensor-block" style="--sb-color:var(--warn)">
+      <div class="sb-label">FLUID TEMPERATURE</div>
+      <div class="sb-value"><span id="metricTemp">—</span><span class="sb-unit">°C</span></div>
+      <div class="sb-trend"><span class="trend-arrow" id="trendT">→</span><span id="trendTText" style="color:var(--text3)">Normal</span></div>
+    </div>
+  </div>
+
+  <div class="counter-strip">
+    <div class="ctr">
+      <div class="ctr-num" id="statTotal">0</div>
+      <div class="ctr-lbl">READINGS</div>
+    </div>
+    <div class="ctr">
+      <div class="ctr-num danger" id="statLeaks">0</div>
+      <div class="ctr-lbl">EVENTS</div>
+    </div>
+    <div class="ctr">
+      <div class="ctr-num" id="statUptime">100%</div>
+      <div class="ctr-lbl">UPTIME</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CHARTS -->
+<div class="main-grid">
+  <div class="chart-primary">
+    <div class="panel-title">
+      REAL-TIME SENSOR TELEMETRY
+      <button class="btn-sm" id="btnPause">⏸</button>
+    </div>
+    <div class="chart-wrap"><canvas id="sensorChart"></canvas></div>
+    <div class="pro-legend">
+      <div class="pro-leg-item">
+        <svg width="28" height="14" viewBox="0 0 28 14">
+          <line x1="0" y1="7" x2="28" y2="7" stroke="#1db87c" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div class="pro-leg-text">
+          <span class="pro-leg-name">PRESSURE</span>
+          <span class="pro-leg-unit">bar</span>
+        </div>
+      </div>
+      <div class="pro-leg-divider"></div>
+      <div class="pro-leg-item">
+        <svg width="28" height="14" viewBox="0 0 28 14">
+          <line x1="0" y1="7" x2="28" y2="7" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div class="pro-leg-text">
+          <span class="pro-leg-name">FLOW RATE</span>
+          <span class="pro-leg-unit">m³/h</span>
+        </div>
+      </div>
+      <div class="pro-leg-divider"></div>
+      <div class="pro-leg-item">
+        <svg width="28" height="14" viewBox="0 0 28 14">
+          <line x1="0" y1="7" x2="28" y2="7" stroke="#e8a020" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div class="pro-leg-text">
+          <span class="pro-leg-name">TEMPERATURE</span>
+          <span class="pro-leg-unit">°C</span>
+        </div>
+      </div>
+      <div class="pro-leg-divider"></div>
+      <div class="pro-leg-item">
+        <svg width="14" height="14" viewBox="0 0 14 14">
+          <circle cx="7" cy="7" r="5" fill="#d94040"/>
+        </svg>
+        <div class="pro-leg-text">
+          <span class="pro-leg-name" style="color:#d94040">ANOMALY EVENT</span>
+          <span class="pro-leg-unit">fault detected</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-secondary">
+    <div class="panel-title">ANOMALY SCORE TREND</div>
+    <div class="chart-wrap"><canvas id="scoreChart"></canvas></div>
+  </div>
+</div>
+
+<!-- BOTTOM PANELS -->
+<div class="bottom-grid">
+
+  <!-- Manual Input -->
+  <div class="b-panel">
+    <div class="panel-title">MANUAL SENSOR ANALYSIS</div>
+    <div class="form-grid">
+      <div class="field-full" style="display:grid;grid-template-columns:1fr 1fr;gap:0.65rem">
+        <div>
+          <label class="f-label">PRESSURE (bar)</label>
+          <input class="f-input" type="number" id="inPressure" placeholder="74.8" step="0.1"/>
+        </div>
+        <div>
+          <label class="f-label">FLOW RATE (m³/h)</label>
+          <input class="f-input" type="number" id="inFlow" placeholder="4.5" step="0.1"/>
+        </div>
+      </div>
+      <div class="field-full">
+        <label class="f-label">TEMPERATURE (°C)</label>
+        <input class="f-input" type="number" id="inTemp" placeholder="32.1" step="0.1"/>
+      </div>
+    </div>
+    <button class="btn-analyse" id="btnManualPredict">ANALYSE READING</button>
+    <div class="buf-status">
+      <span class="buf-bar-wrap"><span class="buf-bar-fill" id="bufBar"></span></span>
+      <span class="buf-text" id="bufCount">0 / 30 readings — keep clicking to fill buffer</span>
+      <button class="buf-reset" id="btnResetBuf">RESET</button>
+    </div>
+    <div class="result-panel" id="manualResult">
+      <div class="r-icon" id="manualIcon">🟢</div>
+      <div class="r-status" id="manualText">NORMAL</div>
+      <div class="r-score" id="manualScore">MSE: 0.000000</div>
+    </div>
+  </div>
+
+
+
+  <!-- Alert Log -->
+  <div class="b-panel">
+    <div class="panel-title">
+      ANOMALY EVENT LOG
+      <span class="badge-pill" id="badgeCount" style="display:none">0 EVENTS</span>
+    </div>
+    <div class="alert-scroll" id="historyList">
+      <div class="empty-state">NO EVENTS RECORDED · SYSTEM NOMINAL</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-wrap" id="alertModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-icon">⚠</span>
+      <span class="modal-title">LEAK DETECTED</span>
+      <span class="modal-badge">PRIORITY ALERT</span>
+    </div>
+    <div class="modal-body" id="alertBody">
+      Anomalous pattern detected. Immediate inspection recommended.
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal" id="btnDismiss">ACKNOWLEDGE</button>
+      <button class="btn-modal primary" onclick="document.getElementById('alertModal').classList.remove('open')">DISPATCH CREW</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ───────────────────────────────────────────────
+   PIPEGUARD AI — Dashboard Application
+─────────────────────────────────────────────── */
+const API = "http://127.0.0.1:8000";
+const MAX = 80, SEQ = 30;
+
+const getToken    = () => localStorage.getItem("pipeguard_token");
+const getUsername = () => localStorage.getItem("pipeguard_username") || "Operator";
+const getRole     = () => localStorage.getItem("pipeguard_role")    || "operator";
+const getFullName = () => localStorage.getItem("pipeguard_full_name") || getUsername();
+function logout(){
+  ["pipeguard_token","pipeguard_username","pipeguard_role","pipeguard_full_name"]
+    .forEach(k=>localStorage.removeItem(k));
+  location.href="login.html";
+}
+if(!getToken()) location.href="login.html";
+
+async function apiFetch(url,opts={}){
+  const r=await fetch(url,{...opts,headers:{"Content-Type":"application/json","Authorization":`Bearer ${getToken()}`,...(opts.headers||{})}});
+  if(r.status===401){logout();return null;}
+  return r;
+}
+
+const $ = id => document.getElementById(id);
+const setText = (id,v) => { const e=$(id); if(e) e.textContent=v; };
+const setHTML = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
+
+/* User display */
+function initUser(){
+  const fn=getFullName(), role=getRole();
+  setText("usernameDisplay",fn);
+  setText("rolePill",role.toUpperCase());
+  const av=$("userAvatar");
+  if(av) av.textContent=(fn.slice(0,2).toUpperCase());
+}
+
+/* Clock */
+function tick(){
+  const n=new Date();
+  setText("clock",
+    `${String(n.getUTCHours()).padStart(2,"0")}:`+
+    `${String(n.getUTCMinutes()).padStart(2,"0")}:`+
+    `${String(n.getUTCSeconds()).padStart(2,"0")} UTC`);
+}
+setInterval(tick,1000); tick();
+
+/* Charts */
+const GRID="rgba(255,255,255,0.05)";
+const TICK={color:"#3a5470",font:{family:"DM Mono",size:10}};
+let sChart,aChart;
+
+function initCharts(){
+  const base={responsive:true,maintainAspectRatio:false,animation:{duration:150},
+    plugins:{legend:{display:false},tooltip:{mode:"index",intersect:false,
+      backgroundColor:"rgba(10,18,40,0.95)",borderColor:"rgba(255,255,255,0.1)",
+      borderWidth:1,titleFont:{family:"DM Mono",size:11},bodyFont:{family:"DM Mono",size:10}}},
+    scales:{x:{type:"category",ticks:{...TICK,maxTicksLimit:7,maxRotation:0},
+      grid:{color:GRID},border:{color:GRID}},
+      y:{ticks:TICK,grid:{color:GRID},border:{color:GRID}}}};
+
+  sChart=new Chart($("sensorChart").getContext("2d"),{
+    type:"line",
+    data:{labels:[],datasets:[
+      {label:"Pressure (bar)",data:[],borderColor:"#1db87c",backgroundColor:"rgba(29,184,124,0.04)",borderWidth:1.5,pointRadius:0,tension:0.35,yAxisID:"yP"},
+      {label:"Flow (m³/h)",  data:[],borderColor:"#4a9eff",backgroundColor:"rgba(74,158,255,0.04)",borderWidth:1.5,pointRadius:0,tension:0.35,yAxisID:"yF"},
+      {label:"Temp (°C)",    data:[],borderColor:"#e8a020",backgroundColor:"rgba(232,160,32,0.04)",borderWidth:1.5,pointRadius:0,tension:0.35,yAxisID:"yF"},
+      {label:"Anomaly",      data:[],borderColor:"transparent",backgroundColor:"#d94040",
+        pointRadius:d=>d.raw!==null?5:0,pointStyle:"rectRot",showLine:false,yAxisID:"yP"},
+    ]},
+    options:{...base,scales:{x:base.scales.x,
+      yP:{...base.scales.y,position:"left",title:{display:true,text:"Pressure (bar)",color:"#3a5470",font:{family:"DM Mono",size:9}}},
+      yF:{...base.scales.y,position:"right",grid:{drawOnChartArea:false},title:{display:true,text:"Flow & Temp",color:"#3a5470",font:{family:"DM Mono",size:9}}}}}
+  });
+
+  aChart=new Chart($("scoreChart").getContext("2d"),{
+    type:"line",
+    data:{labels:[],datasets:[
+      {label:"MSE Score",data:[],borderColor:"#4a9eff",
+        backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,220);
+          g.addColorStop(0,"rgba(74,158,255,0.25)");g.addColorStop(1,"rgba(74,158,255,0)");return g;},
+        borderWidth:1.5,pointRadius:0,tension:0.35,fill:true},
+      {label:"Threshold",data:[],borderColor:"rgba(217,64,64,0.55)",
+        borderWidth:1,borderDash:[5,4],pointRadius:0,fill:false},
+    ]},
+    options:{...base,scales:{x:base.scales.x,y:{...base.scales.y,min:0,
+      title:{display:true,text:"Reconstruction Error (MSE)",color:"#3a5470",font:{family:"DM Mono",size:9}}}}}
+  });
+}
+
+function pushData(d){
+  const lbl=d.timestamp
+    ?new Date(d.timestamp).toLocaleTimeString("en-GB",{hour12:false})
+    :new Date().toLocaleTimeString("en-GB",{hour12:false});
+  const isA=d.is_anomaly||d.status==="Leak Detected";
+  const trim=(arr,v)=>{arr.push(v);if(arr.length>MAX)arr.shift();};
+
+  [sChart.data.labels,aChart.data.labels].forEach(a=>trim(a,lbl));
+  trim(sChart.data.datasets[0].data,d.pressure);
+  trim(sChart.data.datasets[1].data,d.flow_rate);
+  trim(sChart.data.datasets[2].data,d.temperature);
+  trim(sChart.data.datasets[3].data,isA?d.pressure:null);
+  trim(aChart.data.datasets[0].data,d.anomaly_score||0);
+  const thr=(d.score_ratio>0&&d.anomaly_score>0)?(d.anomaly_score/d.score_ratio):null;
+  if(thr!==null){
+    while(aChart.data.datasets[1].data.length<aChart.data.datasets[0].data.length-1)
+      aChart.data.datasets[1].data.push(thr);
+    trim(aChart.data.datasets[1].data,thr);
+  } else { aChart.data.datasets[1].data.push(null); if(aChart.data.datasets[1].data.length>MAX)aChart.data.datasets[1].data.shift(); }
+
+  sChart.update("none"); aChart.update("none");
+}
+
+/* Status update */
+let totalR=0,totalL=0;
+function updateStatus(d){
+  const st=d.status||"Collecting";
+  const sc=d.anomaly_score||0;
+  const ra=d.score_ratio||0;
+
+  document.body.className=st==="Leak Detected"?"s-leak":st==="Warning"?"s-warn":"";
+
+  setText("heroStatus",st==="Collecting"?"INITIALISING…":st.toUpperCase());
+  setText("heroSub",{
+    "Normal":"All sensors within certified operating range",
+    "Warning":"Elevated reconstruction error — enhanced monitoring active",
+    "Leak Detected":"CRITICAL: Anomalous sensor pattern detected — immediate action required",
+    "Collecting":`Buffering sensor readings (${d.buffer_fill||0} / ${SEQ})`
+  }[st]||"");
+
+  const fill=$("gaugeBarFill");
+  if(fill){
+    fill.style.width=`${Math.min(ra*66.6,100)}%`;
+    fill.style.background=ra>=1?"var(--alert)":ra>=0.6?"var(--warn)":"var(--safe)";
+  }
+  setText("scoreValue",`${sc.toFixed(6)}`);
+  const sv=$("scoreValue");
+  if(sv) sv.innerHTML=`${sc.toFixed(6)} <span>MSE</span>`;
+
+  const p=d.pressure,f=d.flow_rate,t=d.temperature;
+  if(p!==undefined){
+    setText("metricPressure",p.toFixed(1));
+    const sb=document.querySelector(".sensor-block:nth-child(1)");
+    if(sb){sb.style.setProperty("--sb-scale",Math.min(((p-61)/28),1));
+      sb.style.setProperty("--sb-color",p<65?"var(--alert)":"var(--safe)");}
+    const tArr=p<67?"↓ Dropping":p>85?"↑ Elevated":"→ Stable";
+    const t2=tArr.split(" ")[0];const t3=tArr.split(" ").slice(1).join(" ");
+    setText("trendP",t2);setText("trendPText",t3);
+  }
+  if(f!==undefined){
+    setText("metricFlow",f.toFixed(2));
+    const tArr=f<3.5?"↓ Below Nominal":f>5.5?"↑ Above Nominal":"→ Nominal";
+    setText("trendF",tArr.split(" ")[0]);setText("trendFText",tArr.split(" ").slice(1).join(" "));
+  }
+  if(t!==undefined){
+    setText("metricTemp",t.toFixed(1));
+    const tArr=t>37?"↑ Elevated":"→ Normal";
+    setText("trendT",tArr.split(" ")[0]);setText("trendTText",tArr.split(" ").slice(1).join(" "));
+  }
+
+  totalR++; if(st==="Leak Detected") totalL++;
+  setText("statTotal",totalR);
+  setText("statLeaks",totalL);
+  setText("statUptime",totalR?(100-(totalL/totalR)*100).toFixed(1)+"%":"100%");
+}
+
+/* Alert log */
+let alertN=0,lastAlertTs=0;
+function addAlert(d){
+  const list=$("historyList"); if(!list)return;
+  list.querySelector(".empty-state")?.remove();
+  const isLeak=d.status==="Leak Detected";
+  const time=new Date(d.timestamp||Date.now()).toLocaleTimeString("en-GB");
+  const row=document.createElement("div");
+  row.className="alert-row"+(isLeak?"":" warning");
+  row.dataset.id=d.id||"";
+  row.innerHTML=`
+    <div class="ar-dot${isLeak?"":" w"}"></div>
+    <div class="ar-info">
+      <div class="ar-event">${d.status.toUpperCase()}</div>
+      <div class="ar-detail">${time} · P:${(d.pressure||0).toFixed(1)} bar · F:${(d.flow_rate||0).toFixed(2)} m³/h · T:${(d.temperature||0).toFixed(1)}°C</div>
+    </div>
+    <div class="ar-score${isLeak?"":" w"}">${(d.anomaly_score||0).toFixed(4)}</div>
+    ${d.id?`<button onclick="ackEvent(${d.id},this)" style="background:none;border:1px solid #3a5470;color:#6e8ba8;border-radius:2px;padding:1px 5px;cursor:pointer;font-family:var(--mono);font-size:0.52rem;margin-left:4px;transition:all 0.2s" onmouseover="this.style.borderColor='#c8962e';this.style.color='#c8962e'" onmouseout="this.style.borderColor='#3a5470';this.style.color='#6e8ba8'">ACK</button>`:""}
+  `;
+  list.prepend(row);
+  while(list.children.length>30) list.lastChild.remove();
+  alertN++;
+  const badge=$("badgeCount");
+  if(badge){badge.style.display="";badge.textContent=`${alertN} EVENT${alertN>1?"S":""}`;}
+  if(isLeak&&Date.now()-lastAlertTs>10000){
+    lastAlertTs=Date.now();showModal(d);
+    setTimeout(()=>document.getElementById('alertModal')?.classList.remove('open'),8000);
+  }
+}
+
+async function ackEvent(id,btn){
+  const r=await apiFetch(`${API}/events/${id}/acknowledge`,{method:"POST",body:JSON.stringify({notes:"Acknowledged via dashboard"})});
+  if(r&&r.ok){btn.closest(".alert-row").style.opacity="0.45";btn.remove();toast("Event acknowledged");}
+}
+
+function showModal(d){
+  setHTML("alertBody",`
+    <strong>Score:</strong> <span class="alert-val">${(d.anomaly_score||0).toFixed(6)} MSE</span><br>
+    P: <strong>${(d.pressure||0).toFixed(1)} bar</strong> &nbsp;·&nbsp;
+    F: <strong>${(d.flow_rate||0).toFixed(2)} m³/h</strong> &nbsp;·&nbsp;
+    T: <strong>${(d.temperature||0).toFixed(1)}°C</strong>
+  `);
+  $("alertModal")?.classList.add("open");
+}
+$("btnDismiss")?.addEventListener("click",()=>$("alertModal")?.classList.remove("open"));
+
+/* Toast */
+function toast(msg,d=3000){
+  const t=$("toast"); if(!t)return;
+  t.textContent=msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),d);
+}
+
+/* SSE */
+let sse=null,paused=false;
+function connect(){
+  if(sse){sse.close();sse=null;}
+  const tok=getToken(); if(!tok){logout();return;}
+  try{
+    sse=new EventSource(`${API}/stream?anomaly_prob=0.12&token=${encodeURIComponent(tok)}`);
+    sse.onopen=()=>{setConn(true);toast("Live data stream connected");};
+    sse.onmessage=e=>{
+      if(paused)return;
+      try{const d=JSON.parse(e.data);updateStatus(d);pushData(d);if(d.is_anomaly||d.status==="Warning")addAlert(d);}
+      catch(ex){console.error(ex);}
+    };
+    sse.onerror=()=>{setConn(false);sse?.close();sse=null;setTimeout(connect,5000);};
+  }catch(e){setConn(false);setTimeout(connect,5000);}
+}
+function setConn(live){
+  const d=$("connDot");
+  if(d) d.className="stream-dot"+(live?" live":" err");
+  setText("connText",live?"LIVE STREAM":"RECONNECTING");
+}
+$("btnPause")?.addEventListener("click",()=>{
+  paused=!paused;
+  setText("btnPause",paused?"▶":"⏸");
+  toast(paused?"Stream paused":"Stream resumed");
+});
+$("btnLogout")?.addEventListener("click",()=>{if(confirm("Sign out of PipeGuard AI?"))logout();});
+
+/* Manual predict — requires 30 accumulated readings */
+const buf=[];
+
+function updateBufUI(){
+  const pct=Math.round((buf.length/SEQ)*100);
+  const fill=$("bufBar");
+  const txt=$("bufCount");
+  if(fill) fill.style.width=pct+"%";
+  if(txt){
+    if(buf.length<SEQ)
+      txt.textContent=buf.length+" / 30 readings — keep clicking to fill buffer";
+    else
+      txt.textContent="Buffer full — prediction active";
+  }
+}
+
+function resetBuf(){
+  buf.length=0;
+  updateBufUI();
+  const rp=$("manualResult");
+  if(rp) rp.className="result-panel";
+  toast("Buffer cleared — enter 30 readings");
+}
+
+$("btnResetBuf")?.addEventListener("click",resetBuf);
+
+// Clear buffer when any input changes
+["inPressure","inFlow","inTemp"].forEach(id=>{
+  $(id)?.addEventListener("input",()=>{buf.length=0;updateBufUI();
+    const rp=$("manualResult");if(rp)rp.className="result-panel";});
+});
+
+$("btnManualPredict")?.addEventListener("click",async()=>{
+  const p=parseFloat($("inPressure")?.value);
+  const f=parseFloat($("inFlow")?.value);
+  const t=parseFloat($("inTemp")?.value);
+  if(isNaN(p)||isNaN(f)||isNaN(t)){toast("Enter all three sensor values");return;}
+
+  const reading={pressure:p,flow_rate:f,temperature:t};
+  buf.push(reading);
+  if(buf.length>SEQ) buf.shift();
+  updateBufUI();
+
+  if(buf.length<SEQ){
+    const rp=$("manualResult");
+    if(rp){
+      rp.className="result-panel show";
+      rp.style.borderLeftColor="var(--text3)";
+      setText("manualIcon","⏳");
+      setText("manualText","COLLECTING "+buf.length+" / 30");
+      setText("manualScore","Click "+(SEQ-buf.length)+" more times");
+    }
+    return;
+  }
+
+  const btn=$("btnManualPredict");
+  btn.disabled=true;btn.textContent="ANALYSING…";
+  try{
+    const r=await apiFetch(`${API}/predict`,{method:"POST",body:JSON.stringify({readings:buf})});
+    if(!r)return;
+    const data={...(await r.json()),...reading};
+    const rp=$("manualResult");
+    if(rp){
+      rp.className="result-panel show";
+      rp.style.borderLeftColor=data.status==="Leak Detected"?"var(--alert)":data.status==="Warning"?"var(--warn)":"var(--safe)";
+      setText("manualIcon",data.status==="Leak Detected"?"🔴":data.status==="Warning"?"🟡":"🟢");
+      setText("manualText",(data.status||"NORMAL").toUpperCase());
+      setText("manualScore",`MSE: ${(data.anomaly_score||0).toFixed(6)}`);
+    }
+    updateStatus(data);
+    pushData({...reading,timestamp:new Date().toISOString(),...data});
+    if(data.is_anomaly||data.status==="Warning") addAlert({...data,timestamp:new Date().toISOString()});
+  } finally {
+    btn.disabled=false;btn.textContent="ANALYSE READING";
+  }
+});
+
+/* Simulate batch */
+$("btnSimulate")?.addEventListener("click",async()=>{
+  const inject=$("chkAnomaly")?.checked||false;
+  toast("Loading simulation batch…");
+  const r=await apiFetch(`${API}/simulate/sequence?n=80&with_anomaly=${inject}`);
+  if(!r)return;
+  const payload=await r.json();
+  clearCharts(); let i=0;
+  const iv=setInterval(()=>{
+    if(i>=payload.data.length){clearInterval(iv);toast(`Simulation complete — ${payload.data.length} readings loaded`);return;}
+    const row=payload.data[i];
+    const d={...row,
+      status:row.is_anomaly?"Leak Detected":"Normal",icon:row.is_anomaly?"🔴":"🟢",
+      anomaly_score:row.is_anomaly?0.05+Math.random()*0.03:Math.random()*0.012,
+      score_ratio:row.is_anomaly?1.2+Math.random()*0.6:0.15+Math.random()*0.35,
+      is_anomaly:Boolean(row.is_anomaly)};
+    updateStatus(d);pushData(d);
+    if(row.is_anomaly)addAlert({...d,timestamp:row.timestamp});
+    i++;
+  },40);
+});
+
+function clearCharts(){
+  [sChart,aChart].forEach(c=>{if(c){c.data.labels=[];c.data.datasets.forEach(ds=>ds.data=[]);c.update("none");}});
+}
+$("btnClear")?.addEventListener("click",()=>{clearCharts();toast("Charts reset");});
+
+/* Load history */
+async function loadHistory(){
+  const r=await apiFetch(`${API}/events?limit=10`);
+  if(!r||!r.ok)return;
+  const {events=[]}=await r.json();
+  events.forEach(e=>addAlert(e));
+}
+
+/* Health check */
+async function checkHealth(){
+  try{
+    const r=await fetch(`${API}/health`,{signal:AbortSignal.timeout(3000)});
+    const d=await r.json();
+    if(d.threshold) setText("thresholdDisplay",d.threshold.toFixed(6)+" MSE");
+    if(!d.model_loaded){toast("Model not loaded — run train.py",6000);setConn(false);return false;}
+    return true;
+  }catch{setConn(false);toast("Backend offline — start the server",6000);return false;}
+}
+
+/* Init */
+document.addEventListener("DOMContentLoaded",async()=>{
+  initUser(); initCharts(); await loadHistory();
+  const ok=await checkHealth();
+  if(ok){connect();}
+  else{const t=setInterval(async()=>{if(await checkHealth()){clearInterval(t);connect();}},8000);}
+});
+</script>
+</body>
+</html>
