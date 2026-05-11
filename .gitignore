@@ -5,3 +5,5 @@ __pycache__/
 .DS_Store
 data/pipeguard.db
 logs/
+models/*.pth
+models/*.pkl
