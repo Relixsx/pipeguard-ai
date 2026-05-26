@@ -1,0 +1,21 @@
+{
+  "threshold": 0.085,
+  "seq_len": 30,
+  "features": [
+    "pressure",
+    "flow_rate",
+    "temperature"
+  ],
+  "n_features": 3,
+  "training_mode": "hybrid",
+  "architecture": "cnn_lstm",
+  "stats": {
+    "threshold": 0.034964879509061575,
+    "mean": 0.02387644723057747,
+    "std": 0.0036961440928280354,
+    "min": 0.013271106407046318,
+    "max": 0.040020737797021866,
+    "sigma": 3.0,
+    "n_samples": 5665
+  }
+}
