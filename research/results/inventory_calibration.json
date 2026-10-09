@@ -1,0 +1,26 @@
+{
+  "0.8": {
+    "events": 2,
+    "healthy_hours": 22.966666666666672,
+    "alarms_per_hour": 0.08708272859216254,
+    "target_alarms_per_hour": 0.1,
+    "candidate_count": 251,
+    "threshold": 0.021646332080573018
+  },
+  "1.0": {
+    "events": 2,
+    "healthy_hours": 22.966666666666672,
+    "alarms_per_hour": 0.08708272859216254,
+    "target_alarms_per_hour": 0.1,
+    "candidate_count": 251,
+    "threshold": 0.008258454211321563
+  },
+  "1.2": {
+    "events": 2,
+    "healthy_hours": 22.966666666666672,
+    "alarms_per_hour": 0.08708272859216254,
+    "target_alarms_per_hour": 0.1,
+    "candidate_count": 251,
+    "threshold": 0.02131451227517858
+  }
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "D1",
+    "title": "Van den Hof, Dankers, Heuberger & Bombois (2013). Identification of dynamic models in complex networks with prediction error methods: Basic methods for consistent module estimates. Automatica 49(10), 2994-3006.",
+    "url": "https://doi.org/10.1016/j.automatica.2013.07.011"
+  },
+  {
+    "id": "D2",
+    "title": "Dankers et al. (2016). Identification of Dynamic Models in Complex Networks with Prediction Error Methods: Predictor Input Selection. IEEE Transactions on Automatic Control 61(4), 937-952.",
+    "url": "https://doi.org/10.1109/TAC.2015.2450895"
+  },
+  {
+    "id": "D3",
+    "title": "Weerts, Van den Hof & Dankers (2018). Identifiability of linear dynamic networks. Automatica 89, 247-258.",
+    "url": "https://doi.org/10.1016/j.automatica.2017.12.013"
+  },
+  {
+    "id": "D4",
+    "title": "Weerts, Van den Hof & Dankers (2018). Single module identifiability in linear dynamic networks. Supplied manuscript: arXiv:1803.02586v1.",
+    "url": "https://arxiv.org/abs/1803.02586"
+  },
+  {
+    "id": "D5",
+    "title": "Dankers, Van den Hof, Materassi & Weerts (2017). Conditions for handling confounding variables in dynamic networks. IFAC-PapersOnLine 50(1), 3983-3988.",
+    "url": "https://doi.org/10.1016/j.ifacol.2017.08.771"
+  },
+  {
+    "id": "D6",
+    "title": "Van den Hof, Shi, Fonken, Ramaswamy, Hjalmarsson & Dankers (2026). Data-informativity conditions for structured linear systems with implications for dynamic networks. Automatica 191, 113110. Supplied arXiv:2409.03883v5 reviewed.",
+    "url": "https://doi.org/10.1016/j.automatica.2026.113110"
+  },
+  {
+    "id": "D7",
+    "title": "Dankers, Jalilian & Westwick (2016). Blind Acoustic Source Separation Via System Identification for Leak Detection in Pipelines. IFAC-PapersOnLine 49(13), 229-234.",
+    "url": "https://doi.org/10.1016/j.ifacol.2016.07.956"
+  },
+  {
+    "id": "D8",
+    "title": "Maneshkarimi, Dankers & Westwick (2025). Integrating System Identification and Blind Source Separation for Real-Time Pipeline Monitoring: A Field Study. American Control Conference, 5079-5085.",
+    "url": "https://doi.org/10.23919/ACC63710.2025.11108069"
+  },
+  {
+    "id": "D9",
+    "title": "Egharevba, Dankers & Zareipour (2025). Forecasting Transmission Line Loss Using a Cluster-Based Refinement Framework and Scheduled Outage Data. IEEE Access.",
+    "url": "https://doi.org/10.1109/ACCESS.2025.3591059"
+  },
+  {
+    "id": "D10",
+    "title": "Egharevba, Dankers & Zareipour (2025). Behind-the-Fence Generation Forecasting: A Batched Decomposition Framework. IEEE Access.",
+    "url": "https://doi.org/10.1109/ACCESS.2025.3583225"
+  }
+]

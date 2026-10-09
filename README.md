@@ -1,320 +1,114 @@
-# ⬡ PipeGuard AI — Pipeline Leak Detection System
-### AI-Powered Anomaly Detection for Oil & Gas Infrastructure
+# PipeGuard Research Lab
 
-> Detects leaks in oil pipelines by learning normal pressure / flow / temperature
-> patterns with an LSTM Autoencoder, then flagging deviations in real time.
+A deployable pipeline-monitoring research prototype. The UI and API run together, without a visitor login, and compare **four frozen methods on the same sensor stream**. This update integrates the executed research into the original PipeGuard application.
 
----
+The models were trained on a three-volume, isothermal, quasi-steady gas simulator. This is a scholarship/interview demonstration and a reproducible research starting point. Field performance, leak cause and leak localization are unestablished.
 
-## 📂 Project Structure
+## Try it locally
 
-```
-pipeline-leak-detection/
-│
-├── backend/
-│   ├── config.py              ← Single source of truth: all paths, constants, hyperparameters
-│   ├── utils.py               ← Shared helpers: logging, threshold computation, event builders
-│   ├── data_simulation.py     ← Sensor data generator + anomaly injection
-│   ├── preprocessing.py       ← MinMaxScaler, sliding-window sequencer, CSV I/O
-│   ├── model.py               ← LSTM Autoencoder architecture (Encoder + Decoder)
-│   ├── train.py               ← Training loop, threshold selection, artifact saving
-│   ├── predict.py             ← PipelinePredictor: inference singleton used by main.py
-│   └── main.py                ← FastAPI app: routing only, delegates ML to predict.py
-│
-├── frontend/
-│   ├── index.html             ← Dashboard layout
-│   ├── styles.css             ← Industrial dark-theme UI
-│   └── app.js                 ← Chart.js, SSE client, API integration
-│
-├── models/                    ← Auto-created by train.py
-│   ├── lstm_autoencoder.pth   ← Trained model weights
-│   ├── scaler.pkl             ← Fitted MinMaxScaler
-│   └── threshold.json         ← Anomaly threshold + statistics
-│
-├── data/                      ← Auto-created by train.py
-│   └── simulated_pipeline_data.csv
-│
-├── requirements.txt
-└── README.md
-```
+Python 3.12:
 
-### Module Dependency Graph
-
-```
-config.py  ←──────────────────────────────────────────────────┐
-    ↑                                                           │
-utils.py   ←─────────────────────────────────┐               │
-    ↑                                         │               │
-data_simulation.py   preprocessing.py   model.py             │
-         ↑                  ↑               ↑                 │
-         └──────────────────┴───────────────┘                 │
-                          train.py                            │
-                                                              │
-         predict.py  (imports model, preprocessing, utils, config)
-              ↑
-           main.py  (imports predict, data_simulation, preprocessing, utils, config)
-```
-
-Each module has one clear job. `main.py` contains **zero ML logic** — it only routes HTTP traffic.
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-| Tool    | Minimum Version |
-|---------|----------------|
-| Python  | 3.10           |
-| pip     | 23+            |
-
----
-
-### Step 1 — Install Dependencies
-
-```bash
-# From the project root
+```sh
+python -m venv .venv
+. .venv/bin/activate
 pip install -r requirements.txt
+sh start.sh
 ```
 
-> **Apple Silicon / Windows GPU:** Visit https://pytorch.org/get-started/locally/ for the correct torch install command.
+Open **http://localhost:8000**. The dashboard and inference API share the same origin. Do not open the HTML directly from the filesystem. No model training, GPU, account signup or credentials are required.
 
----
+With Docker:
 
-### Step 2 — Train the Model
-
-```bash
-cd backend/
-python train.py
+```sh
+docker compose up --build
 ```
 
-**What happens:**
-1. Simulates 2,000 normal pipeline readings → saved to `data/simulated_pipeline_data.csv`
-2. Fits a MinMaxScaler on normal data → saved to `models/scaler.pkl`
-3. Trains LSTM Autoencoder for 40 epochs → saved to `models/lstm_autoencoder.pth`
-4. Computes 3-sigma anomaly threshold → saved to `models/threshold.json`
+For Render or another host, see [DEPLOYMENT.md](DEPLOYMENT.md). The same application binds the host-provided `PORT` and exposes `/health` for readiness checks.
 
-**Expected output:**
-```
-════════════════════════════════════════════════════════════
-  ⬡  PipeGuard AI — LSTM Autoencoder Training
-════════════════════════════════════════════════════════════
+## What is implemented
 
-  [1 / 5]  Simulating pipeline sensor data …
-           Normal rows   : 2,000
-           Total rows    : 2,000
-           Anomaly rows  : 162  (8.1%)
+- Actual CNN–LSTM and residual CNN–LSTM checkpoint inference through ONNX Runtime, alongside the regularized dynamic predictor and gas inventory balance.
+- Seven repeatable scenarios: abrupt/growing leaks, healthy operation, valve transition, sensor drift, missing sensors and weak excitation. Size, location, command range and random seed are configurable.
+- Causal trailing windows, isolated per-run histories, warm-up after missing readings or time gaps, and persistence/clearance/cooldown alarm logic.
+- Replay and inspect the sensor and score traces. Scenario ground truth is displayed separately and never enters model inference.
+- Import numeric sensor CSVs in the explicit eight-feature SI schema. The reference remains simulation-trained; imports do not confer field validation.
+- Download all readings, scores and alert states, including healthy periods. Review the full report, ten-paper mapping, original-source audit and saved benchmark results in the UI.
+- Bounded compute and ephemeral run storage. No external chart libraries or hard-coded backend URLs in the dashboard.
 
-  [2 / 5]  Fitting MinMaxScaler on normal data …
+## Frozen models and results
 
-  [3 / 5]  Building sliding-window sequences (window = 30) …
-           Sequences shape : (1971, 30, 3)
-           Train / Val     : 1773 / 198
+The deployed neural seed is 11. The full research includes seeds 11, 23 and 37; broader calibration was executed only for seed 11. All four methods receive the same eight input channels, but monitor different objectives: the raw autoencoder reconstructs eight channels, the predictor forecasts six physical channels, and the hybrid checks six innovations.
 
-  [4 / 5]  Training LSTM Autoencoder (40 epochs) …
-           Device      : cpu
-           Parameters  : 74,947
+Exploratory broader-calibration evaluation on **66 fresh simulated runs**, including **36 injected leak events**, with **28.5806 scored healthy test hours**:
 
-           [████░░░░░░░░░░░░░░░░]   5/40  Train: 0.018234  │  Val: 0.017891
-           ...
-           [████████████████████]  40/40  Train: 0.001234  │  Val: 0.001456
+| Method | New post-onset detections | False alarm events/hour | Median delay among detected events | Pressure-drift cases alerted |
+|---|---:|---:|---:|---:|
+| Mass balance | 36/36 | 0.245 | 94.5 s | 0/6 |
+| Dynamic predictor | 25/36 | 0.210 | 212 s | 6/6 |
+| CNN–LSTM | 0/36 | 0.070 | No detections | 0/6 |
+| Residual hybrid | 25/36 | 0.210 | 212 s | 6/6 |
 
-  [5 / 5]  Computing anomaly threshold (σ = 3.0) …
-           Threshold  : 0.008742
+Only a new confirmed alarm at or after leak onset earns detection credit. Pre-existing false alarms receive no credit. Missed events remain in recall. The dashboard also shows confidence intervals and the narrow-calibration comparison on these same test runs.
 
-✅  Training complete!
-```
+Mass balance is promising in this controlled simulator, with known volumes/gas properties. Its false alarm rate still exceeds the 0.1/hour calibration target, and it missed all six pressure-drift cases. Hybrid superiority is not established. Do not interpret the simulated 36/36 result as a field accuracy claim.
 
-Training takes **1–5 minutes** on CPU.
+A separate small real gas-acoustic pilot used 150 unique one-second clips, including 30 test clips. It is not SCADA, not session-held-out field validation, and not multichannel source separation. Raw audio is not bundled because redistribution rights and acquisition independence are unclear.
 
----
+## Code layout
 
-### Step 3 — Start the API Server
+| Path | Purpose |
+|---|---|
+| `backend/main.py` | Same-origin web/API, validation, bounds, downloads and readiness |
+| `backend/runtime.py` | Frozen ONNX/ARX/physics inference; sensor readings and timestamps only |
+| `backend/experiments.py` | Scenarios, bounded storage, exports and post-inference truth comparisons |
+| `backend/simulator.py`, `backend/physics.py` | Audited simulator and inventory calculation |
+| `frontend/` | Dashboard, local SVG plots, replay and CSV import |
+| `deployment/models/` | Two ONNX models, dynamic reference, frozen config and SHA-256 manifest |
+| `deployment/evidence/` | Executed results, report, immutable example and replay parity evidence |
+| `research/` | Reproducible training/calibration scripts, original PyTorch checkpoints and reading record |
+| `legacy/` | Preserved original application, data and weights; excluded from deployment |
+| `tests/`, `tools/` | Integration checks, export verification and benchmark replay |
 
-```bash
-# Still inside backend/
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
+The legacy label-driven score demo, account gate, global stream buffer and anomaly-only persistence are not the serving path in version 2.
 
-| URL                              | Purpose                    |
-|----------------------------------|----------------------------|
-| http://127.0.0.1:8000            | API root                   |
-| http://127.0.0.1:8000/docs       | Interactive Swagger UI     |
-| http://127.0.0.1:8000/health     | System health check        |
+## Verification and reproduction
 
----
-
-### Step 4 — Open the Dashboard
-
-```bash
-# macOS
-open ../frontend/index.html
-
-# Linux
-xdg-open ../frontend/index.html
-
-# Windows
-start ..\frontend\index.html
+```sh
+pip install -r requirements-dev.txt
+python -m unittest discover -s tests -p 'test_*.py' -v
+python tools/verify_benchmark.py
 ```
 
-Or serve it properly (avoids any browser CORS quirks):
-```bash
-cd ../frontend && python -m http.server 3000
-# Then open http://localhost:3000
+`verify_benchmark.py` regenerates all 66 final scenarios and verifies the deployed methods against **all 264 archived model/run alarm traces**. It is a parity check, not new validation data. Tests also check causal prefixes, missing/gapped readings, isolation, real API scores, complete exports and request bounds.
+
+For browser checks, run the server in another terminal:
+
+```sh
+python -m playwright install chromium
+python tools/browser_smoke.py --url http://localhost:8000
 ```
 
----
+To re-export the supplied neural checkpoints, install PyTorch CPU from its official wheel index, then the research dependencies:
 
-## 🔌 API Reference
-
-### `GET /health`
-```json
-{
-  "status": "ok",
-  "model_loaded": true,
-  "threshold": 0.008742,
-  "buffer_size": 15,
-  "seq_len": 30,
-  "features": ["pressure", "flow_rate", "temperature"],
-  "history_count": 3
-}
+```sh
+pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements-research.txt
+python tools/export_models.py
+python tools/build_example.py
 ```
 
-### `GET /simulate?anomaly=false`
-```json
-{
-  "reading": { "pressure": 80.3, "flow_rate": 501.2, "temperature": 44.9 },
-  "forced_anomaly": false
-}
-```
+The export checks reconstructions and scores against PyTorch for batches 1, 7 and 32. Checkpoint/artifact hashes and error magnitudes are recorded in `deployment/models/manifest.json`.
 
-### `GET /simulate/sequence?n=80&with_anomaly=true`
-```json
-{
-  "data": [
-    { "timestamp": "2024-01-01T00:00:00", "pressure": 80.1, "flow_rate": 498.3,
-      "temperature": 45.0, "is_anomaly": 0 },
-    ...
-  ],
-  "count": 80
-}
-```
+Training and calibration commands are in [research/README.md](research/README.md). The large generated cohort is not committed here; `run_benchmark.py` regenerates it by default. To replay archived checkpoints without retraining, generate that cohort first with `pipeguard.simulator.generate_cohort`.
 
-### `POST /predict`
-**Request body:**
-```json
-{
-  "readings": [
-    { "pressure": 80.2, "flow_rate": 498.3, "temperature": 45.1 },
-    "... (at least 30 readings)"
-  ]
-}
-```
-**Response:**
-```json
-{
-  "status": "Normal",
-  "color": "green",
-  "icon": "🟢",
-  "is_anomaly": false,
-  "score_ratio": 0.2341,
-  "anomaly_score": 0.001923,
-  "pressure": 80.2,
-  "flow_rate": 498.3,
-  "temperature": 45.1,
-  "timestamp": "2024-01-15T08:30:00Z"
-}
-```
+## Data and research provenance
 
-### `GET /stream?anomaly_prob=0.12`
-Server-Sent Events — subscribes to a continuous 1-reading/second stream.
-Each `data:` event is a JSON object identical in shape to the /predict response.
+The paper mapping and reading ledger cover the ten supplied Dankers/collaborator papers. Implemented adaptations are distinguished from theorem assumptions, diagnostic approximations and proposed acoustic extensions. Read [research/PAPER_MAPPING.md](research/PAPER_MAPPING.md) and [research/DATA_ACCESS.md](research/DATA_ACCESS.md).
 
-### `GET /history?limit=50`
-```json
-{
-  "events": [
-    {
-      "timestamp": "2024-01-15T08:30:00Z",
-      "status": "Leak Detected",
-      "anomaly_score": 0.014231,
-      "score_ratio": 1.628,
-      "pressure": 61.2,
-      "flow_rate": 412.0,
-      "temperature": 47.8
-    }
-  ],
-  "total": 3,
-  "limit": 50
-}
-```
+NGPOD is a substantially better conceptual fit for gas pressure/flow monitoring, but its raw arrays were absent from the linked repository when audited. OLGA multiphase data require author/provider access. Neither is presented as acquired or used to train this demo.
 
----
+## Public demo boundaries
 
-## 🧠 How the AI Works
+The default single-worker server permits one experiment computation at a time, keeps at most 12 ephemeral runs for at most one hour, and limits new computations per client. Restarts and free-host sleep can discard those runs. Export a run if it matters. CSV uploads are held in memory, not written to disk or used for training. Run URLs are unguessable identifiers; this public research demo is not a sensitive operational-data portal.
 
-```
-Normal Pipeline Data (training only)
-         │
-         ▼
-┌────────────────────────────────────┐
-│       LSTM Autoencoder             │
-│                                    │
-│  (seq, 3) → Encoder → (latent, 16) │
-│           → Decoder → (seq, 3)     │
-└────────────────────────────────────┘
-         │
-         ▼
-   Reconstruction MSE
-         │
-         ├─ score < 0.6 × threshold  → 🟢 Normal
-         ├─ score < 1.0 × threshold  → 🟡 Warning
-         └─ score ≥ 1.0 × threshold  → 🔴 Leak Detected
-```
-
-**Core insight:** The autoencoder is trained to reconstruct normal sensor sequences.
-When a leak occurs, the pattern is unfamiliar — reconstruction error spikes above the threshold.
-
-**Threshold** is set at `mean + 3σ` of normal training errors (the 3-sigma rule).
-
----
-
-## ⚙️ Configuration
-
-All tuneable parameters are in **`backend/config.py`**:
-
-| Parameter          | Default | Effect                                          |
-|--------------------|---------|--------------------------------------------------|
-| `EPOCHS`           | 40      | More epochs → better model (diminishing returns) |
-| `SEQ_LEN`          | 30      | Longer window → more context, slower inference  |
-| `HIDDEN_DIM`       | 64      | Wider LSTM → more capacity, more compute         |
-| `SIGMA_MULTIPLIER` | 3.0     | Lower → more sensitive; Higher → fewer alarms   |
-| `STREAM_INTERVAL`  | 1.0 s   | Seconds between SSE events                      |
-| `DEFAULT_ANOMALY_PROB` | 0.12 | Leak probability in simulated stream           |
-
----
-
-## 🛠 Troubleshooting
-
-| Symptom                         | Fix                                                       |
-|---------------------------------|-----------------------------------------------------------|
-| `Model not loaded` on startup   | Run `python train.py` first                              |
-| Dashboard shows "Reconnecting"  | Start the server: `uvicorn main:app --port 8000`         |
-| All readings show "Normal"      | Lower `SIGMA_MULTIPLIER` in `config.py` and retrain      |
-| Too many false alarms           | Raise `SIGMA_MULTIPLIER` in `config.py` and retrain      |
-| `torch` install fails           | See https://pytorch.org/get-started/locally/             |
-| Browser CORS error              | Serve frontend via `python -m http.server 3000`          |
-
----
-
-## 🌍 Context
-
-Built for Nigeria's petroleum sector to enable early detection of oil pipeline leaks —
-reducing environmental damage, preventing revenue loss, and improving operator situational
-awareness across the NPN-GRID-07 pipeline monitoring network.
-
----
-
-## 📄 License
-
-MIT — free to use, modify, and deploy.
+The optional Swagger API docs load their viewer from jsDelivr; the dashboard itself has no external runtime dependencies. A deployment of this repository is not an industrial leak alarm or a substitute for validated safety instrumentation.

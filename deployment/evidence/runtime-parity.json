@@ -1,0 +1,7 @@
+{
+  "runs": 66,
+  "model_run_comparisons": 264,
+  "alarm_timestamps_match": true,
+  "seconds": 18.149,
+  "scope": "Replay parity, not new validation data"
+}

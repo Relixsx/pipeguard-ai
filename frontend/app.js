@@ -1,574 +1,254 @@
-/**
- * app.js  v2 — PipeGuard AI Production Dashboard
- * ─────────────────────────────────────────────────
- * Changes from v1:
- *   - Auth guard: redirects to login.html if no JWT
- *   - All API calls include Authorization: Bearer header
- *   - 401 responses → automatic redirect to login
- *   - SSE stream passes token as query param
- *   - Logout button handler
- *   - Acknowledge anomaly event buttons in history log
- *   - CSV export buttons
- *   - /metrics endpoint populates aggregate stats
- */
-
 "use strict";
 
-const API_BASE   = "http://127.0.0.1:8000";
-const MAX_POINTS = 80;
-const SEQ_LEN    = 30;
-
-// ──────────────────────────────────────────────────────────────────
-//  Auth helpers
-// ──────────────────────────────────────────────────────────────────
-
-function getToken()    { return localStorage.getItem("pipeguard_token"); }
-function getUsername() { return localStorage.getItem("pipeguard_username") || "operator"; }
-function getRole()     { return localStorage.getItem("pipeguard_role") || "operator"; }
-function getFullName() { return localStorage.getItem("pipeguard_full_name") || getUsername(); }
-
-function authHeaders() {
-  return {
-    "Content-Type":  "application/json",
-    "Authorization": `Bearer ${getToken()}`,
-  };
-}
-
-function logout() {
-  localStorage.removeItem("pipeguard_token");
-  localStorage.removeItem("pipeguard_username");
-  localStorage.removeItem("pipeguard_role");
-  localStorage.removeItem("pipeguard_full_name");
-  window.location.href = "login.html";
-}
-
-/** Wrap fetch — auto-redirect on 401 */
-async function apiFetch(url, options = {}) {
-  const res = await fetch(url, {
-    ...options,
-    headers: { ...authHeaders(), ...(options.headers || {}) },
-  });
-  if (res.status === 401) {
-    logout();
-    return null;
-  }
-  return res;
-}
-
-// ──────────────────────────────────────────────────────────────────
-//  Auth guard — must run before anything else
-// ──────────────────────────────────────────────────────────────────
-
-(function authGuard() {
-  if (!getToken()) {
-    window.location.href = "login.html";
-  }
-})();
-
-// ──────────────────────────────────────────────────────────────────
-//  State
-// ──────────────────────────────────────────────────────────────────
-
-let sensorChart  = null;
-let scoreChart   = null;
-let sseSource    = null;
-let isPaused     = false;
-let totalReadings = 0;
-let totalLeaks    = 0;
-
-const readingBuffer = [];
-
-// ──────────────────────────────────────────────────────────────────
-//  DOM helpers
-// ──────────────────────────────────────────────────────────────────
-
+// Same-origin requests work on localhost, Render, Railway and custom domains.
+// Predictions always come from the backend. This file never synthesizes scores.
 const $ = id => document.getElementById(id);
+const names = ["mass_inventory", "dynamic_residual", "cnn_lstm", "hybrid"];
+const labels = { mass_inventory: "Mass balance", dynamic_residual: "Dynamic predictor", cnn_lstm: "CNN–LSTM", hybrid: "Residual hybrid" };
+const colors = { mass_inventory: "#368b7e", dynamic_residual: "#6280bc", cnn_lstm: "#b18b40", hybrid: "#986c95" };
+const descriptions = { mass_inventory: "Inlet − outlet flow, corrected for gas storage.", dynamic_residual: "Forecast errors from lagged sensors and commands.", cnn_lstm: "Reconstruction error across the eight inputs.", hybrid: "Neural innovations and the dynamic check." };
+let config, evidence, run = null, cursor = 719, timer = null, busy = false;
+let coverage = "broad";
 
-// Null-safe setter helpers
-function setText(id, val) { const el = $(id); if (el) el.textContent = val; }
-function setHTML(id, val) { const el = $(id); if (el) el.innerHTML = val; }
+function escapeHTML(value) { return String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function clock(seconds) { const s = Math.max(0, Math.floor(seconds)); return `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`; }
+function valueText(value, digits = 2) { return value == null || !Number.isFinite(value) ? "—" : value.toFixed(digits); }
+function message(text, error = false) { $("message").textContent = text; $("message").classList.toggle("error", error); $("message").hidden = !text; }
+function stopReplay() { if (timer) clearInterval(timer); timer = null; $("play-button").textContent = "▶"; $("play-button").setAttribute("aria-label", "Replay simulated time"); }
 
-// ──────────────────────────────────────────────────────────────────
-//  User display
-// ──────────────────────────────────────────────────────────────────
-
-function initUserDisplay() {
-  setText("usernameDisplay", getFullName());
-  const pill = $("rolePill");
-  pill.textContent = getRole();
-  if (getRole() === "admin") pill.classList.add("admin");
-}
-
-// ──────────────────────────────────────────────────────────────────
-//  Clock
-// ──────────────────────────────────────────────────────────────────
-
-function tickClock() {
-  const now = new Date();
-  setText("clock",
-    `${String(now.getUTCHours()).padStart(2,"0")}:` +
-    `${String(now.getUTCMinutes()).padStart(2,"0")}:` +
-    `${String(now.getUTCSeconds()).padStart(2,"0")} UTC`);
-}
-setInterval(tickClock, 1000);
-tickClock();
-
-// ──────────────────────────────────────────────────────────────────
-//  Charts
-// ──────────────────────────────────────────────────────────────────
-
-const CHART_DEFAULTS = {
-  responsive: true,
-  maintainAspectRatio: false,
-  animation: { duration: 200 },
-  plugins: { legend: { display: false }, tooltip: { mode: "index", intersect: false } },
-  scales: {
-    x: {
-      type: "category",
-      ticks: { color: "#3d5060", font: { family: "Share Tech Mono", size: 10 }, maxTicksLimit: 8, maxRotation: 0 },
-      grid:  { color: "rgba(255,255,255,0.04)" },
-    },
-    y: {
-      ticks: { color: "#3d5060", font: { family: "Share Tech Mono", size: 10 } },
-      grid:  { color: "rgba(255,255,255,0.04)" },
-    },
-  },
-};
-
-function initCharts() {
-  const sCtx = $("sensorChart").getContext("2d");
-  sensorChart = new Chart(sCtx, {
-    type: "line",
-    data: {
-      labels: [],
-      datasets: [
-        { label: "Pressure",    data: [], borderColor: "#00e676", backgroundColor: "rgba(0,230,118,0.05)", borderWidth: 1.5, pointRadius: 0, tension: 0.4, yAxisID: "yPressure" },
-        { label: "Flow Rate",   data: [], borderColor: "#40c4ff", backgroundColor: "rgba(64,196,255,0.05)", borderWidth: 1.5, pointRadius: 0, tension: 0.4, yAxisID: "yFlow" },
-        { label: "Temperature", data: [], borderColor: "#ffab00", backgroundColor: "rgba(255,171,0,0.05)",  borderWidth: 1.5, pointRadius: 0, tension: 0.4, yAxisID: "yTemp" },
-        { label: "Anomaly",     data: [], borderColor: "transparent", backgroundColor: "#ff3d3d", pointRadius: d => d.raw !== null ? 6 : 0, showLine: false, yAxisID: "yPressure" },
-      ],
-    },
-    options: {
-      ...CHART_DEFAULTS,
-      scales: {
-        x: CHART_DEFAULTS.scales.x,
-        yPressure: { ...CHART_DEFAULTS.scales.y, position: "left",  title: { display: true, text: "Pressure (bar)", color: "#3d5060", font: { family: "Share Tech Mono", size: 9 } } },
-        yFlow:     { ...CHART_DEFAULTS.scales.y, position: "right", grid: { drawOnChartArea: false }, title: { display: true, text: "Flow / Temp", color: "#3d5060", font: { family: "Share Tech Mono", size: 9 } } },
-        yTemp:     { display: false, position: "right" },
-      },
-    },
-  });
-
-  const aCtx = $("scoreChart").getContext("2d");
-  scoreChart = new Chart(aCtx, {
-    type: "line",
-    data: {
-      labels: [],
-      datasets: [
-        { label: "Anomaly Score", data: [], borderColor: "#40c4ff", backgroundColor: ctx => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,260); g.addColorStop(0,"rgba(64,196,255,0.3)"); g.addColorStop(1,"rgba(64,196,255,0)"); return g; }, borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true },
-        { label: "Threshold",     data: [], borderColor: "rgba(255,61,61,0.5)", borderWidth: 1, borderDash: [4,4], pointRadius: 0, fill: false },
-      ],
-    },
-    options: { ...CHART_DEFAULTS, scales: { x: CHART_DEFAULTS.scales.x, y: { ...CHART_DEFAULTS.scales.y, min: 0 } } },
-  });
-}
-
-// ──────────────────────────────────────────────────────────────────
-//  Push data to charts
-// ──────────────────────────────────────────────────────────────────
-
-function pushToCharts(data) {
-  const label = data.timestamp
-    ? new Date(data.timestamp).toLocaleTimeString("en-GB", { hour12: false })
-    : new Date().toLocaleTimeString("en-GB", { hour12: false });
-
-  const isAnomaly = data.is_anomaly || data.status === "Leak Detected";
-
-  function trim(arr, val) { arr.push(val); if (arr.length > MAX_POINTS) arr.shift(); }
-
-  const sd = sensorChart.data;
-  trim(sd.labels,           label);
-  trim(sd.datasets[0].data, data.pressure);
-  trim(sd.datasets[1].data, data.flow_rate);
-  trim(sd.datasets[2].data, data.temperature);
-  trim(sd.datasets[3].data, isAnomaly ? data.pressure : null);
-
-  const ad = scoreChart.data;
-  trim(ad.labels,           label);
-  trim(ad.datasets[0].data, data.anomaly_score || 0);
-  const thr = (data.score_ratio > 0 && data.anomaly_score > 0)
-    ? (data.anomaly_score / data.score_ratio) : null;
-  if (thr !== null) {
-    while (ad.datasets[1].data.length < ad.datasets[0].data.length - 1) ad.datasets[1].data.push(thr);
-    trim(ad.datasets[1].data, thr);
-  } else {
-    ad.datasets[1].data.push(null);
-    if (ad.datasets[1].data.length > MAX_POINTS) ad.datasets[1].data.shift();
-  }
-
-  sensorChart.update("none");
-  scoreChart.update("none");
-}
-
-// ──────────────────────────────────────────────────────────────────
-//  Status UI
-// ──────────────────────────────────────────────────────────────────
-
-function updateStatus(data) {
-  const status = data.status || "Collecting";
-  const score  = data.anomaly_score || 0;
-  const ratio  = data.score_ratio   || 0;
-
-  let hex, bodyClass;
-  if (status === "Leak Detected") { hex = "#ff3d3d"; bodyClass = "state-leak"; }
-  else if (status === "Warning")  { hex = "#ffab00"; bodyClass = "state-warning"; }
-  else                            { hex = "#00e676"; bodyClass = ""; }
-
-  document.body.className = bodyClass;
-  const heroEl = document.querySelector(".hero");
-  heroEl.style.setProperty("--ring-color",   hex);
-  heroEl.style.setProperty("--status-color", hex);
-
-  $("statusIcon").textContent  = data.icon || "🟢";
-  $("heroStatus").textContent  = status === "Collecting" ? "Initialising…" : status;
-  $("heroSub").textContent     = {
-    "Normal":        "All sensors within operating range",
-    "Warning":       "Unusual readings — monitoring closely",
-    "Leak Detected": "ALERT: Anomalous sensor pattern detected!",
-    "Collecting":    `Buffering readings (${data.buffer_fill || 0}/${SEQ_LEN})`,
-  }[status] || "";
-
-  const barPct = Math.min(ratio * 66.6, 100);
-  const fillEl = $("scoreBarFill");
-  fillEl.style.width = `${barPct}%`;
-  fillEl.style.background = ratio >= 1.0
-    ? "linear-gradient(90deg,#ff3d3d,#ff6b6b)"
-    : ratio >= 0.6
-      ? "linear-gradient(90deg,#ffab00,#ffd54f)"
-      : "linear-gradient(90deg,#00e676,#40c4ff)";
-  $("scoreValue").textContent = score.toFixed(6);
-
-  const p = data.pressure, f = data.flow_rate, t = data.temperature;
-  if (p !== undefined) {
-    $("metricPressure").textContent = p.toFixed(1);
-    $("barPressure").style.width    = `${Math.min((p/120)*100,100)}%`;
-    $("barPressure").style.background = p < 60 ? "var(--red)" : "var(--green)";
-    $("trendPressure").textContent  = p < 65 ? "↓" : p > 90 ? "↑" : "→";
-    $("cardPressure").classList.toggle("active", p < 65);
-  }
-  if (f !== undefined) {
-    $("metricFlow").textContent   = f.toFixed(0);
-    $("barFlow").style.width      = `${Math.min((f/700)*100,100)}%`;
-    $("barFlow").style.background = Math.abs(f-500) > 80 ? "var(--amber)" : "var(--blue)";
-    $("trendFlow").textContent    = f < 420 ? "↓" : f > 580 ? "↑" : "→";
-  }
-  if (t !== undefined) {
-    $("metricTemp").textContent   = t.toFixed(1);
-    $("barTemp").style.width      = `${Math.min(((t-30)/40)*100,100)}%`;
-    $("barTemp").style.background = t > 50 ? "var(--red)" : "var(--amber)";
-    $("trendTemp").textContent    = t > 50 ? "↑" : "→";
-  }
-
-  totalReadings++;
-  if (status === "Leak Detected") totalLeaks++;
-  $("statTotal").textContent  = totalReadings;
-  $("statLeaks").textContent  = totalLeaks;
-  $("statUptime").textContent = totalReadings
-    ? (100 - (totalLeaks/totalReadings)*100).toFixed(1)+"%"
-    : "100%";
-}
-
-// ──────────────────────────────────────────────────────────────────
-//  History log
-// ──────────────────────────────────────────────────────────────────
-
-let alertCount   = 0;
-let lastAlertTime = 0;
-
-function addHistoryEvent(data) {
-  const list  = $("historyList");
-  const empty = list.querySelector(".history-empty");
-  if (empty) empty.remove();
-
-  const cls  = data.status === "Leak Detected" ? "leak" : "warning";
-  const icon = data.status === "Leak Detected" ? "🔴" : "🟡";
-  const time = new Date(data.timestamp || Date.now()).toLocaleTimeString("en-GB");
-  const evId = data.id;
-
-  const item = document.createElement("div");
-  item.className = `history-item ${cls}`;
-  item.dataset.id = evId || "";
-  item.innerHTML = `
-    <span class="history-item-icon">${icon}</span>
-    <div class="history-item-info">
-      <div class="history-item-title">${data.status}</div>
-      <div class="history-item-meta">${time} · P:${(data.pressure||0).toFixed(1)} bar · F:${(data.flow_rate||0).toFixed(0)} m³/h</div>
-    </div>
-    <span class="history-item-score">${(data.anomaly_score||0).toFixed(4)}</span>
-    ${evId ? `<button class="btn-ack" data-id="${evId}" title="Acknowledge">✓</button>` : ""}
-  `;
-  list.prepend(item);
-  while (list.children.length > 30) list.lastChild.remove();
-
-  alertCount++;
-  $("badgeCount").textContent = alertCount;
-
-  if (data.status === "Leak Detected" && Date.now() - lastAlertTime > 10000) {
-    lastAlertTime = Date.now();
-    showLeakModal(data);
-  }
-}
-
-// Acknowledge via API
-document.addEventListener("click", async e => {
-  if (!e.target.classList.contains("btn-ack")) return;
-  const evId = e.target.dataset.id;
-  if (!evId) return;
-  const res = await apiFetch(`${API_BASE}/events/${evId}/acknowledge`, {
-    method: "POST",
-    body:   JSON.stringify({ notes: "Acknowledged from dashboard" }),
-  });
-  if (res && res.ok) {
-    const row = document.querySelector(`.history-item[data-id="${evId}"]`);
-    if (row) { row.style.opacity = "0.5"; e.target.remove(); }
-    showToast("✅ Event acknowledged");
-  }
-});
-
-function showLeakModal(data) {
-  $("alertBody").innerHTML = `
-    Anomalous sensor readings detected at pipeline monitoring point.<br><br>
-    <strong style="color:var(--red)">Score: ${(data.anomaly_score||0).toFixed(5)}</strong><br>
-    Pressure: <strong>${(data.pressure||0).toFixed(1)} bar</strong> ·
-    Flow: <strong>${(data.flow_rate||0).toFixed(0)} m³/h</strong> ·
-    Temp: <strong>${(data.temperature||0).toFixed(1)}°C</strong><br><br>
-    Dispatch field crew for inspection immediately.
-  `;
-  $("alertModal").classList.remove("hidden");
-}
-
-$("btnDismiss").addEventListener("click", () => $("alertModal").classList.add("hidden"));
-
-// ──────────────────────────────────────────────────────────────────
-//  Toast
-// ──────────────────────────────────────────────────────────────────
-
-function showToast(msg, duration = 3000) {
-  const t = $("toast");
-  t.textContent = msg;
-  t.classList.remove("hidden", "hide");
-  t.classList.add("show");
-  setTimeout(() => {
-    t.classList.replace("show", "hide");
-    setTimeout(() => t.classList.add("hidden"), 300);
-  }, duration);
-}
-
-// ──────────────────────────────────────────────────────────────────
-//  SSE stream — token passed as query param
-// ──────────────────────────────────────────────────────────────────
-
-function connectStream() {
-  if (sseSource) { sseSource.close(); sseSource = null; }
-
-  const token = getToken();
-  if (!token) { logout(); return; }
-
-  const url = `${API_BASE}/stream?anomaly_prob=0.12&token=${encodeURIComponent(token)}`;
-
+async function request(path, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120000);
   try {
-    sseSource = new EventSource(url);
-
-    sseSource.onopen = () => {
-      setConnStatus(true);
-      showToast("✅ Live stream connected");
-    };
-
-    sseSource.onmessage = event => {
-      if (isPaused) return;
-      try {
-        const data = JSON.parse(event.data);
-        updateStatus(data);
-        pushToCharts(data);
-        if (data.is_anomaly || data.status === "Warning") addHistoryEvent(data);
-      } catch (e) { console.error("SSE parse:", e); }
-    };
-
-    sseSource.onerror = () => {
-      setConnStatus(false);
-      if (sseSource) { sseSource.close(); sseSource = null; }
-      setTimeout(connectStream, 5000);
-    };
-  } catch (e) {
-    setConnStatus(false);
-    setTimeout(connectStream, 5000);
-  }
-}
-
-function setConnStatus(live) {
-  $("connDot").className    = "conn-dot" + (live ? " live" : " error");
-  $("connText").textContent = live ? "Live Stream" : "Reconnecting…";
-}
-
-// ──────────────────────────────────────────────────────────────────
-//  Pause / Resume
-// ──────────────────────────────────────────────────────────────────
-
-$("btnPause").addEventListener("click", () => {
-  isPaused = !isPaused;
-  $("btnPause").textContent = isPaused ? "▶" : "⏸";
-  showToast(isPaused ? "⏸ Stream paused" : "▶ Stream resumed");
-});
-
-// ──────────────────────────────────────────────────────────────────
-//  Manual Predict
-// ──────────────────────────────────────────────────────────────────
-
-$("btnManualPredict").addEventListener("click", async () => {
-  const pressure    = parseFloat($("inPressure").value);
-  const flow_rate   = parseFloat($("inFlow").value);
-  const temperature = parseFloat($("inTemp").value);
-
-  if (isNaN(pressure) || isNaN(flow_rate) || isNaN(temperature)) {
-    showToast("⚠️ Please fill all three sensor fields");
-    return;
-  }
-
-  const reading = { pressure, flow_rate, temperature };
-  readingBuffer.push(reading);
-  if (readingBuffer.length > SEQ_LEN) readingBuffer.shift();
-
-  let data;
-  if (readingBuffer.length < SEQ_LEN) {
-    data = { status: "Collecting", color: "gray", icon: "⏳", is_anomaly: false, anomaly_score: 0, buffer_fill: readingBuffer.length, buffer_needed: SEQ_LEN, ...reading };
-  } else {
-    const res = await apiFetch(`${API_BASE}/predict`, {
-      method: "POST",
-      body:   JSON.stringify({ readings: readingBuffer }),
-    });
-    if (!res) return;
-    data = { ...(await res.json()), ...reading };
-  }
-
-  const resEl = $("manualResult");
-  resEl.classList.remove("hidden");
-  $("manualIcon").textContent  = data.icon || "⏳";
-  $("manualText").textContent  = data.status || "Collecting";
-  $("manualScore").textContent = `Score: ${(data.anomaly_score||0).toFixed(6)}`;
-  resEl.style.borderColor = data.color === "green" ? "var(--green)"
-    : data.color === "red" ? "var(--red)" : data.color === "yellow" ? "var(--amber)" : "var(--border-hi)";
-
-  if (readingBuffer.length >= SEQ_LEN) {
-    updateStatus(data);
-    pushToCharts({ ...reading, timestamp: new Date().toISOString(), ...data });
-    if (data.is_anomaly || data.status === "Warning") addHistoryEvent({ ...data, ...reading, timestamp: new Date().toISOString() });
-  }
-
-  const need = SEQ_LEN - readingBuffer.length;
-  if (need > 0) showToast(`⏳ ${need} more reading${need > 1 ? "s" : ""} needed to classify`);
-});
-
-// ──────────────────────────────────────────────────────────────────
-//  Simulate batch
-// ──────────────────────────────────────────────────────────────────
-
-$("btnSimulate").addEventListener("click", async () => {
-  const withAnomaly = $("chkAnomaly").checked;
-  showToast("🔄 Fetching simulated pipeline batch…");
-
-  const res = await apiFetch(`${API_BASE}/simulate/sequence?n=80&with_anomaly=${withAnomaly}`);
-  if (!res) return;
-  const payload = await res.json();
-
-  clearCharts();
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i >= payload.data.length) { clearInterval(interval); showToast(`✅ Loaded ${payload.data.length} readings`); return; }
-    const row  = payload.data[i];
-    const data = {
-      ...row,
-      status:        row.is_anomaly ? "Leak Detected" : "Normal",
-      color:         row.is_anomaly ? "red"           : "green",
-      icon:          row.is_anomaly ? "🔴"            : "🟢",
-      anomaly_score: row.is_anomaly ? 0.012 + Math.random()*0.02 : Math.random()*0.004,
-      score_ratio:   row.is_anomaly ? 1.1   + Math.random()*0.5  : 0.2 + Math.random()*0.3,
-      is_anomaly:    Boolean(row.is_anomaly),
-    };
-    updateStatus(data);
-    pushToCharts(data);
-    if (row.is_anomaly) addHistoryEvent({ ...data, timestamp: row.timestamp });
-    i++;
-  }, 40);
-});
-
-// ──────────────────────────────────────────────────────────────────
-//  Clear charts
-// ──────────────────────────────────────────────────────────────────
-
-function clearCharts() {
-  [sensorChart, scoreChart].forEach(chart => {
-    chart.data.labels = [];
-    chart.data.datasets.forEach(ds => ds.data = []);
-    chart.update("none");
-  });
-}
-$("btnClear").addEventListener("click", () => { clearCharts(); showToast("🗑 Charts cleared"); });
-
-// ──────────────────────────────────────────────────────────────────
-//  Logout
-// ──────────────────────────────────────────────────────────────────
-
-$("btnLogout").addEventListener("click", () => {
-  if (confirm("Sign out of PipeGuard AI?")) logout();
-});
-
-// ──────────────────────────────────────────────────────────────────
-//  Load DB history on startup
-// ──────────────────────────────────────────────────────────────────
-
-async function loadHistory() {
-  const res = await apiFetch(`${API_BASE}/events?limit=20`);
-  if (!res || !res.ok) return;
-  const { events } = await res.json();
-  if (!events || events.length === 0) return;
-  events.forEach(ev => addHistoryEvent(ev));
-}
-
-// ──────────────────────────────────────────────────────────────────
-//  Health check
-// ──────────────────────────────────────────────────────────────────
-
-async function checkHealth() {
-  try {
-    const res  = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
-    const data = await res.json();
-    if (!data.model_loaded) {
-      showToast("⚠️ Model not loaded — run train.py first!", 6000);
-      setConnStatus(false);
-      return false;
+    const response = await fetch(path, { ...options, signal: controller.signal });
+    if (!response.ok) {
+      let detail = `${response.status} ${response.statusText}`;
+      const text = await response.text();
+      try { const data = JSON.parse(text); detail = typeof data.detail === "string" ? data.detail : data.detail?.map(v => v.msg).join("; ") || detail; } catch { detail = text || detail; }
+      throw new Error(detail);
     }
-    return true;
-  } catch {
-    setConnStatus(false);
-    showToast("❌ Backend offline — start FastAPI server first!", 6000);
-    return false;
-  }
+    return await response.json();
+  } catch (error) { if (error.name === "AbortError") throw new Error("The server took too long to respond. A sleeping deployment may need a moment; try again."); throw error; }
+  finally { clearTimeout(timeout); }
 }
 
-// ──────────────────────────────────────────────────────────────────
-//  Initialise
-// ──────────────────────────────────────────────────────────────────
+function setBusy(value) {
+  busy = value;
+  $("run-button").disabled = value;
+  $("csv-upload").disabled = value;
+  $("run-button").firstElementChild.textContent = value ? "Computing all four methods…" : "Run experiment";
+  $("scenario-form").setAttribute("aria-busy", String(value));
+}
 
-document.addEventListener("DOMContentLoaded", async () => {
-  initUserDisplay();
-  initCharts();
-  await loadHistory();
-  const ok = await checkHealth();
-  if (ok) {
-    connectStream();
-  } else {
-    const retryId = setInterval(async () => {
-      if (await checkHealth()) { clearInterval(retryId); connectStream(); }
-    }, 8000);
+function createCards() {
+  $("model-cards").innerHTML = names.map((name, i) => `<article class="card model-card" style="--model-color:${colors[name]}" id="card-${name}"><div class="model-title"><h3>${labels[name]}</h3><span class="model-number">0${i+1}</span></div><p class="description">${descriptions[name]}</p><div class="model-status warm" id="status-${name}"><span class="status-dot"></span><span>Waiting for readings</span></div><div class="score-value" id="value-${name}">—<small>× threshold</small></div><div class="score-note" id="score-${name}">Frozen healthy-calibration threshold</div><div class="model-summary" id="summary-${name}">No experiment yet</div></article>`).join("");
+  $("score-legend").innerHTML = names.map(name => `<span><i class="legend-dot" style="background:${colors[name]}"></i>${labels[name]}</span>`).join("") + `<span class="legend-end">Threshold ratio = 1</span>`;
+}
+
+function setupScenario() {
+  const scenario = $("scenario").value;
+  const leak = ["leak", "gradual_leak"].includes(scenario);
+  $("leak-controls").hidden = !leak;
+  $("scenario-description").textContent = config?.scenarios[scenario]?.description || "";
+}
+
+function applyRun(data) {
+  stopReplay();
+  run = data;
+  cursor = run.time_s.length - 1;
+  $("timeline").max = String(cursor);
+  $("timeline").value = String(cursor);
+  $("timeline").disabled = false;
+  $("play-button").disabled = false;
+  $("show-truth").disabled = run.ground_truth == null;
+  $("run-kind").textContent = run.source === "simulation" ? "SIMULATED READINGS" : "UPLOADED READINGS";
+  $("duration").textContent = clock(run.time_s.at(-1) - run.time_s[0]);
+  const scenarioLabel = config.scenarios[run.scenario]?.label || "Uploaded sensor readings";
+  $("run-meta").textContent = run.source === "simulation" ? `${scenarioLabel} · seed ${run.seed} · ${run.compute_seconds.toFixed(3)} s compute` : `${run.time_s.length} uploaded readings · simulation reference`;
+  for (const format of ["csv", "json"]) {
+    const link = $(`export-${format}`);
+    link.href = `/api/runs/${encodeURIComponent(run.id)}/export.${format}`;
+    link.classList.remove("disabled"); link.setAttribute("aria-disabled", "false");
   }
+  renderRun();
+}
+
+function renderRun() {
+  if (!run) return;
+  $("clock").textContent = clock(run.time_s[cursor] - run.time_s[0]);
+  const row = run.readings[cursor];
+  const truthVisible = $("show-truth").checked && run.ground_truth;
+  const leakNow = truthVisible && run.ground_truth.leak_present[cursor];
+  for (let i = 0; i < 3; i++) {
+    $(`pressure-${i}`).textContent = `${valueText(row[i] == null ? null : row[i] / 1e6, 3)} MPa`;
+    $(`volume-${i}`).classList.toggle("injected", Boolean(leakNow && run.ground_truth.injected_location === i));
+  }
+  $("flow-in").textContent = `${valueText(row[3], 3)} kg/s`;
+  $("flow-out").textContent = `${valueText(row[4], 3)} kg/s`;
+  $("truth-callout").classList.toggle("leak", Boolean(leakNow));
+  if (!run.ground_truth) $("truth-callout").textContent = "No ground truth supplied. An anomaly does not establish a leak, its cause or its location. Check the units and reference suitability.";
+  else if (!truthVisible) $("truth-callout").textContent = "Injected ground truth hidden. Model scores and alert states are unchanged. Location inference: unestablished.";
+  else if (run.ground_truth.onset_s == null) $("truth-callout").textContent = `${config.scenarios[run.scenario].description} No leak was injected. Location inference: unestablished.`;
+  else if (leakNow) $("truth-callout").textContent = `Known injection: volume ${"ABC"[run.ground_truth.injected_location]}, ${Math.round(run.leak_fraction * 100)}% nominal size, onset ${clock(run.ground_truth.onset_s)}. This is scenario truth, not an inferred location.`;
+  else $("truth-callout").textContent = `Known injection begins at ${clock(run.ground_truth.onset_s)}. Before that point, no leak is present. Location inference: unestablished.`;
+  for (const name of names) {
+    const model = run.predictions.models[name], score = model.scores[cursor];
+    const quality = run.predictions.quality[cursor];
+    const status = $(`status-${name}`);
+    const pending = score != null && score > model.threshold && !model.active[cursor];
+    const state = quality === "data_quality_alert" ? "Sensor data missing" : score == null ? "Warming up" : model.active[cursor] ? "Anomaly alert" : pending ? "Confirming exceedance" : "Within reference";
+    status.className = `model-status ${quality === "data_quality_alert" ? "quality" : score == null ? "warm" : model.active[cursor] ? "alert" : pending ? "quality" : ""}`;
+    status.lastElementChild.textContent = state;
+    $(`value-${name}`).innerHTML = `${valueText(score == null ? null : score / model.threshold, 2)}<small>× threshold</small>`;
+    $(`score-${name}`).textContent = score == null ? `${run.predictions.warmup_readings} consecutive valid readings required` : `Score ${score.toPrecision(4)} / threshold ${model.threshold.toPrecision(4)}`;
+    const events = model.event_times_s.filter(t => t <= run.time_s[cursor]);
+    const after = run.ground_truth?.onset_s == null ? [] : events.filter(t => t >= run.ground_truth.onset_s);
+    let summary = `${events.length} new alarm event${events.length === 1 ? "" : "s"} so far`;
+    if (after.length) summary = `New post-onset alarm · delay ${Math.round(after[0] - run.ground_truth.onset_s)} s`;
+    else if (run.ground_truth?.onset_s != null && run.time_s[cursor] >= run.ground_truth.onset_s) summary = "No new post-onset alarm so far";
+    $(`summary-${name}`).textContent = summary;
+  }
+  renderCharts();
+}
+
+// Exact sensor/score traces, rendered locally without external chart libraries.
+function chartSVG(series, yMin, yMax, {log = false, threshold = null, suffix = ""} = {}) {
+  const width = 900, height = 205, left = 56, right = 18, top = 13, bottom = 30;
+  const span = run.time_s.at(-1) - run.time_s[0] || 1;
+  const x = i => left + (run.time_s[i] - run.time_s[0]) / span * (width-left-right);
+  const transform = value => log ? Math.log10(Math.max(value, .01)) : value;
+  const a = transform(yMin), b = transform(yMax);
+  const y = value => top + (b - transform(value)) / (b-a || 1) * (height-top-bottom);
+  let svg = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${log ? "Model scores relative to threshold" : "Measured pressures"} across simulated time"><g font-family="monospace" font-size="10" fill="#93a391">`;
+  const tickValues = log ? [.01,.1,1,10,100,1000,10000,100000].filter(v => v >= yMin && v <= yMax) : [0,1,2,3].map(i => yMin + (yMax-yMin)*i/3);
+  for (const value of tickValues) svg += `<path d="M${left} ${y(value)} H${width-right}" stroke="#e8eee4" stroke-width="1"/><text x="${left-10}" y="${y(value)+3}" text-anchor="end">${log ? value : value.toFixed(2)}${suffix}</text>`;
+  for (let t = 0; t <= 4; t++) { const px = left+t/4*(width-left-right); svg += `<text x="${px}" y="${height-7}" text-anchor="middle">${Math.round(span*t/4/60)} min</text>`; }
+  svg += "</g>";
+  if (threshold != null) svg += `<path d="M${left} ${y(threshold)} H${width-right}" stroke="#c1a05a" stroke-dasharray="5 5" stroke-width="1.3"/>`;
+  if ($("show-truth").checked && run.ground_truth?.onset_s != null && run.ground_truth.onset_s <= run.time_s[cursor]) { const px = left+(run.ground_truth.onset_s-run.time_s[0])/span*(width-left-right); svg += `<path d="M${px} ${top} V${height-bottom}" stroke="#c1866a" stroke-dasharray="4 4" stroke-width="1"/>`; }
+  for (const item of series) {
+    let path = "", open = false;
+    // Preserve all observations. Explicit missing points break the path.
+    for (let i = 0; i <= cursor; i++) {
+      const value = item.values[i];
+      if (value == null || !Number.isFinite(value)) { open = false; continue; }
+      path += `${open ? "L" : "M"}${x(i).toFixed(2)} ${y(value).toFixed(2)} `; open = true;
+    }
+    svg += `<path d="${path}" fill="none" stroke="${item.color}" stroke-width="1.5" stroke-linejoin="round"/>`;
+  }
+  svg += `<path d="M${x(cursor)} ${top} V${height-bottom}" stroke="#a9bcab" stroke-width="1" opacity=".45"/></svg>`;
+  return svg;
+}
+
+function renderCharts() {
+  const pressure = [0,1,2].map((column, i) => ({values:run.readings.map(row => row[column] == null ? null : row[column]/1e6), color:[colors.mass_inventory,colors.dynamic_residual,colors.cnn_lstm][i]}));
+  const finite = pressure.flatMap(s => s.values).filter(v => v != null);
+  if (finite.length) {
+    const low = Math.min(...finite), high = Math.max(...finite), pad = Math.max(.008,(high-low)*.12);
+    $("pressure-chart").innerHTML = chartSVG(pressure, low-pad, high+pad);
+  } else $("pressure-chart").textContent = "Pressure data unavailable. Scoring is suspended while sensors are missing.";
+  const scores = names.map(name => ({values:run.predictions.models[name].scores.map(v => v == null ? null : v/run.predictions.models[name].threshold),color:colors[name]}));
+  const maxRatio = Math.max(10,...scores.flatMap(s => s.values).filter(v => v != null));
+  $("score-chart").innerHTML = chartSVG(scores,.01,Math.pow(10,Math.ceil(Math.log10(maxRatio))),{log:true,threshold:1});
+}
+
+function play() {
+  if (!run) return;
+  if (timer) { stopReplay(); return; }
+  if (cursor === run.time_s.length-1) cursor = 0;
+  $("play-button").textContent = "Ⅱ"; $("play-button").setAttribute("aria-label","Pause replay");
+  renderRun();
+  timer = setInterval(() => {
+    cursor = Math.min(run.time_s.length-1, cursor + Math.max(1,Math.round(Number($("speed").value)*.15/5)));
+    $("timeline").value = String(cursor); renderRun();
+    if (cursor === run.time_s.length-1) stopReplay();
+  }, 150);
+}
+
+function renderEvidence() {
+  const rows = evidence.simulation.summaries.filter(row => row.calibration_coverage === coverage);
+  $("result-table").innerHTML = names.map(name => {
+    const row = rows.find(v => v.model === name || (name === "mass_inventory" && v.model.startsWith("mass_inventory")));
+    if (!row) return "";
+    const ci = row.event_recall_95pct_ci.map(v => (v*100).toFixed(1)).join("–");
+    return `<tr><td><div class="method-name"><i class="legend-dot" style="background:${colors[name]}"></i>${labels[name]}</div></td><td><strong>${row.detected_events} / ${row.leak_events}</strong></td><td><strong>${(row.event_recall*100).toFixed(1)}%</strong><span>${ci}%</span></td><td><strong>${row.false_alarms_per_hour.toFixed(3)}</strong><span>${row.false_alarm_events} events / ${row.healthy_hours.toFixed(2)} h</span></td><td><strong>${row.median_detected_delay_s == null ? "No detections" : `${row.median_detected_delay_s.toFixed(1)} s`}</strong></td><td><strong>${row.sensor_bias_alerted_runs} / 6</strong></td></tr>`;
+  }).join("");
+  document.querySelectorAll("[data-coverage]").forEach(button => { const active = button.dataset.coverage === coverage; button.classList.toggle("selected",active); button.setAttribute("aria-pressed",String(active)); });
+  $("acoustic-results").innerHTML = evidence.acoustic.summaries.map(row => `<div class="acoustic-method" style="--model-color:${colors[row.model]}"><h3>${labels[row.model]}</h3><strong>${row.true_positive} / ${row.leak_test_clips}</strong><span>leak clips detected</span><small>Recall CI: ${row.recall_95pct_ci.map(v => (v*100).toFixed(1)).join("–")}%</small><p>${row.false_positive} / ${row.healthy_test_clips} healthy clips flagged</p></div>`).join("");
+  $("references").innerHTML = evidence.references.map(ref => `<li><span>${escapeHTML(ref.id)}</span><a href="${escapeHTML(ref.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(ref.title)} ↗</a></li>`).join("");
+}
+
+function selectTab(name, focus = false) {
+  document.querySelectorAll("[data-tab]").forEach(button => {
+    const active = button.dataset.tab === name;
+    button.classList.toggle("selected", active); button.setAttribute("aria-selected", String(active)); button.tabIndex = active ? 0 : -1;
+    $(`panel-${button.dataset.tab}`).hidden = !active;
+    if (active && focus) button.focus();
+  });
+}
+
+function parseCSV(text) {
+  const lines = text.replace(/^\uFEFF/, "").trim().split(/\r?\n/);
+  const fields = line => line.split(",").map(v => v.trim().replace(/^"(.*)"$/, "$1"));
+  const header = fields(lines.shift());
+  const required = ["timestamp_s", ...config.models.schema];
+  const indices = required.map(name => header.indexOf(name));
+  if (indices.some(i => i < 0)) throw new Error(`CSV requires these columns: ${required.join(", ")}`);
+  if (new Set(header).size !== header.length) throw new Error("CSV column names must be unique.");
+  const number = (token, allowMissing) => {
+    if (!token || /^(na|nan|null)$/i.test(token)) { if (allowMissing) return null; throw new Error("Every row needs a numeric timestamp_s."); }
+    const value = Number(token); if (!Number.isFinite(value)) throw new Error(`Invalid numeric reading: ${token.slice(0,30)}`); return value;
+  };
+  const readings = lines.filter(line => line.trim()).map(line => {
+    const cols = fields(line); if (cols.length !== header.length) throw new Error("Every CSV row must have the same number of columns as the header.");
+    return {timestamp_s:number(cols[indices[0]],false),values:indices.slice(1).map(i => number(cols[i],true))};
+  });
+  if (readings.length < 32 || readings.length > 1200) throw new Error("Upload between 32 and 1,200 readings. Use the template for the required SI units.");
+  return {readings};
+}
+
+$("scenario-form").addEventListener("submit", async event => {
+  event.preventDefault(); if (busy || !config || !$("scenario-form").reportValidity()) return;
+  stopReplay(); setBusy(true); message("Running the simulator and all four frozen models. No ground-truth labels enter inference.");
+  const payload = {scenario:$("scenario").value,leak_fraction:Number($("leak-fraction").value),location:Number($("location").value),regime:$("regime").value,seed:Number($("seed").value)};
+  try { const data = await request("/api/runs", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}); applyRun(data); message(`Experiment complete. ${data.time_s.length} readings scored in ${data.compute_seconds.toFixed(3)} s. Replay the trace or export the complete record.`); }
+  catch (error) { message(error.message,true); }
+  finally { setBusy(false); }
 });
+$("csv-upload").addEventListener("change", async event => {
+  const file = event.target.files[0]; if (!file || busy || !config) return;
+  stopReplay(); setBusy(true);
+  try {
+    if (file.size > 400000) throw new Error("CSV exceeds 400 kB. Upload a shorter segment.");
+    const payload = parseCSV(await file.text());
+    message("Scoring the uploaded sensor readings against the simulation reference…");
+    applyRun(await request("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}));
+    message("Upload analyzed. Check SI units and reference suitability: these models have no field validation. Additional CSV columns were ignored.");
+  } catch (error) { message(error.message,true); }
+  finally { setBusy(false); event.target.value = ""; }
+});
+$("scenario").addEventListener("change",setupScenario);
+$("play-button").addEventListener("click",play);
+$("show-truth").addEventListener("change",renderRun);
+$("timeline").addEventListener("input",event => { stopReplay(); cursor=Number(event.target.value); renderRun(); });
+document.querySelectorAll("[data-tab]").forEach(button => {
+  button.addEventListener("click",()=>selectTab(button.dataset.tab));
+  button.addEventListener("keydown",event => {
+    if (!["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) return;
+    event.preventDefault(); const tabs=["lab","results","research"],i=tabs.indexOf(button.dataset.tab);
+    const next=event.key === "Home" ? 0 : event.key === "End" ? 2 : (i+(event.key === "ArrowRight" ? 1 : 2))%3;
+    selectTab(tabs[next],true);
+  });
+});
+document.querySelectorAll("[data-coverage]").forEach(button => button.addEventListener("click",()=>{coverage=button.dataset.coverage;if(evidence)renderEvidence();}));
+window.addEventListener("pagehide",stopReplay);
+createCards(); selectTab("lab");
+async function initialize() {
+  try {
+    const [settings, health, record, example] = await Promise.all([request("/api/config"),request("/health"),request("/api/evidence"),request("/api/example")]);
+    config=settings;evidence=record;setupScenario();renderEvidence();applyRun(example);
+    $("server-status").textContent=`${health.models_loaded} methods ready`;
+    message("Loaded a reproducible example from the actual model runtime. Change the controls and run your own experiment.");
+  } catch (error) { $("server-status").textContent="Engine unavailable";message(`Could not load the research lab. ${error.message}`,true); }
+}
+initialize();

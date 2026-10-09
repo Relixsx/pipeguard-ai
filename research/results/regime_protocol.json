@@ -1,0 +1,16 @@
+{
+  "healthy_additional_seed_start": 61000,
+  "extra_healthy_runs": 30,
+  "fixed_methods": [
+    "dynamic_residual",
+    "cnn_lstm_11",
+    "hybrid_11",
+    "mass_inventory_nominal"
+  ],
+  "test_seed_start": 81000,
+  "test_runs": 66,
+  "alarm_budget_per_healthy_hour": 0.1,
+  "weight_updates": false,
+  "purpose": "Check calibration coverage, after initial operating-regime failures.",
+  "scope": "Exploratory follow-up with independent seeds from the same simulator."
+}

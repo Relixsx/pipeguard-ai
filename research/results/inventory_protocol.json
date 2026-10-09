@@ -1,0 +1,13 @@
+{
+  "window": 30,
+  "volume_scales": [
+    0.8,
+    1.0,
+    1.2
+  ],
+  "calibration_alarm_budget_per_hour": 0.1,
+  "fresh_seed_start": 41000,
+  "fresh_cohort_size": 66,
+  "method_scope": "Known geometry, constant gas temperature and Z; optimistic simulation physics baseline.",
+  "exploratory_note": "Added after inspecting initial ARX results. Fresh seeds provide replication within the same simulator, not external validation."
+}

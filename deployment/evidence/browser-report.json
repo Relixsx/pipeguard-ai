@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "Packaged example displays actual four-model inference",
+    "Truth toggle cannot alter model scores; replay controls work",
+    "Both calibration comparisons and saved acoustic results display",
+    "Ten paper references and qualified dataset plan display",
+    "New inference request, dropout suspension and warm-up display",
+    "CSV download contains all readings; SI-schema import uses actual API",
+    "390 px responsive layout has no horizontal overflow"
+  ],
+  "browser_errors": [],
+  "status": "passed",
+  "url": "http://127.0.0.1:8000"
+}

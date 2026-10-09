@@ -1,0 +1,15 @@
+.git
+legacy
+research
+models
+data
+logs
+tests
+tools
+*.zip
+__pycache__
+**/__pycache__
+*.pyc
+.venv
+.env
+node_modules

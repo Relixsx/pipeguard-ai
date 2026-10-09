@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "serving_environment_has_torch": false,
+  "non_root_verified": false,
+  "dynamic_port": 41077,
+  "methods_loaded": 4,
+  "actual_inference_readings": 720,
+  "scope": "Docker file-set/entrypoint check; no Docker image build performed"
+}

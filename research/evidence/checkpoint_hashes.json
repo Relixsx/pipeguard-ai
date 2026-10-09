@@ -1,0 +1,10 @@
+{
+  "results/models/cnn_lstm_37.pt": "3a1c221e26f625ca2428e39bcf804e68095b2ac09fd3e2d6b81f498eb0ea02fb",
+  "results/models/hybrid_23.pt": "0cacc02b4d594b5098f5802a7cb68b48aef9e060c975c484f0352ac9b04344d9",
+  "results/models/dynamic_reference.npz": "82b82f7171be1e36e442b6d2bb382a8f4cccbe9cbf379ceef7e4c7804467d96a",
+  "results/models/hybrid_37.pt": "2a95e6fe8b2ef747970f71a5b62946f7510f28da7c7b1a5ba9920fc55fe3fa4c",
+  "results/models/cnn_lstm_23.pt": "6cf2490404ec98a24c3a940447d77e71ba70b4433d9305fb2e77943815c4f370",
+  "results/models/cnn_lstm_11.pt": "966cb6d8e7fec689e097559aa7ae967898262c3211be8e64fc53af6d3b2d70f5",
+  "results/models/hybrid_11.pt": "15c6bad601476dc12e353d9601983383a67548cb2ae2b3217812bbab57915800",
+  "results/models/original_three_features.pt": "01766c4a5c9e248192d34f6ab2acb8c18df9b94e860812b7bbb57714bac4b61b"
+}

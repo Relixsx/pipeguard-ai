@@ -1,0 +1,67 @@
+{
+  "format": "ONNX",
+  "opset": 17,
+  "seed": 11,
+  "torch_version": "2.14.1+cpu",
+  "onnxruntime_version": "1.24.1",
+  "checks": [
+    {
+      "model": "cnn_lstm",
+      "batch": 1,
+      "max_output_error": 3.2782554626464844e-07,
+      "max_score_error": 0.0
+    },
+    {
+      "model": "cnn_lstm",
+      "batch": 7,
+      "max_output_error": 5.662441253662109e-07,
+      "max_score_error": 1.1920928955078125e-07
+    },
+    {
+      "model": "cnn_lstm",
+      "batch": 32,
+      "max_output_error": 5.960464477539062e-07,
+      "max_score_error": 1.1920928955078125e-07
+    },
+    {
+      "model": "hybrid",
+      "batch": 1,
+      "max_output_error": 8.344650268554688e-07,
+      "max_score_error": 1.1920928955078125e-07
+    },
+    {
+      "model": "hybrid",
+      "batch": 7,
+      "max_output_error": 2.1457672119140625e-06,
+      "max_score_error": 1.7881393432617188e-07
+    },
+    {
+      "model": "hybrid",
+      "batch": 32,
+      "max_output_error": 1.6689300537109375e-06,
+      "max_score_error": 2.384185791015625e-07
+    }
+  ],
+  "files": {
+    "cnn_lstm_11.onnx": {
+      "sha256": "60a71ef1e5cd9780815d9aa2e3abf1eb057dd19b088fe1147c19c05795fa6667",
+      "bytes": 580482
+    },
+    "dynamic_reference.npz": {
+      "sha256": "82b82f7171be1e36e442b6d2bb382a8f4cccbe9cbf379ceef7e4c7804467d96a",
+      "bytes": 3054
+    },
+    "hybrid_11.onnx": {
+      "sha256": "2382efb2ea584e21c0f62c6d0e33cad30c6de4fb4ac0c67d3a441b9af2a06e5a",
+      "bytes": 579194
+    },
+    "config.json": {
+      "sha256": "5d58b37275ecb64cb3e568a36c53adef168acd4fc8c49003334358a17ef8cf25",
+      "bytes": 857
+    }
+  },
+  "checkpoints": {
+    "cnn_lstm": "966cb6d8e7fec689e097559aa7ae967898262c3211be8e64fc53af6d3b2d70f5",
+    "hybrid": "15c6bad601476dc12e353d9601983383a67548cb2ae2b3217812bbab57915800"
+  }
+}

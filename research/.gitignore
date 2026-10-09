@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.venv/
+data/acoustic/
+reading_log.sqlite

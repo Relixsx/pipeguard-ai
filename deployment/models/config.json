@@ -1,0 +1,30 @@
+{
+  "schema": [
+    "pressure_in_pa",
+    "pressure_mid_pa",
+    "pressure_out_pa",
+    "inlet_mass_flow_kg_s",
+    "outlet_mass_flow_kg_s",
+    "temperature_k",
+    "upstream_command_pa",
+    "outlet_valve_command"
+  ],
+  "sample_s": 5,
+  "sequence_length": 30,
+  "lag": 2,
+  "seed": 11,
+  "source_commit": "f3acfde210161a396cb1835bcabd2a413ba20e78",
+  "thresholds": {
+    "dynamic_residual": 23.906078048705982,
+    "cnn_lstm": 18.70625104141237,
+    "hybrid": 10.920479654312116,
+    "mass_inventory": 0.02008840326880925
+  },
+  "hybrid_neural_scale": 2.1352012157440186,
+  "hybrid_dynamic_scale": 2.247454881668091,
+  "persistence": 3,
+  "clearance": 5,
+  "cooldown_s": 120,
+  "calibration": "broad healthy coverage, independent simulation seeds",
+  "scope": "Simulation-trained research demonstration. No field validation or inferred leak location."
+}
