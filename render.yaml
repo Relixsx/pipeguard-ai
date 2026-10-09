@@ -1,0 +1,13 @@
+# For a new Render demo service. Existing service updates: DEPLOYMENT.md.
+services:
+  - type: web
+    name: pipeguard-research-lab
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: PORT
+        value: "10000"

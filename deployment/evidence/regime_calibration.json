@@ -1,0 +1,38 @@
+{
+  "dynamic_residual": {
+    "events": 5,
+    "healthy_hours": 51.67500000000004,
+    "alarms_per_hour": 0.09675858732462499,
+    "target_alarms_per_hour": 0.1,
+    "candidate_count": 251,
+    "threshold": 23.906078048705982,
+    "old_threshold": 3.341869968891146
+  },
+  "cnn_lstm": {
+    "events": 5,
+    "healthy_hours": 51.67500000000004,
+    "alarms_per_hour": 0.09675858732462499,
+    "target_alarms_per_hour": 0.1,
+    "candidate_count": 251,
+    "threshold": 18.70625104141237,
+    "old_threshold": 1.1260737102031693
+  },
+  "hybrid": {
+    "events": 5,
+    "healthy_hours": 51.67500000000004,
+    "alarms_per_hour": 0.09675858732462499,
+    "target_alarms_per_hour": 0.1,
+    "candidate_count": 251,
+    "threshold": 10.920479654312116,
+    "old_threshold": 1.5148723224401475
+  },
+  "mass_inventory": {
+    "events": 5,
+    "healthy_hours": 51.67500000000004,
+    "alarms_per_hour": 0.09675858732462499,
+    "target_alarms_per_hour": 0.1,
+    "candidate_count": 251,
+    "threshold": 0.02008840326880925,
+    "old_threshold": 0.008258454211321563
+  }
+}

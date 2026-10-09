@@ -1,0 +1,57 @@
+{
+  "unit_tests": 11,
+  "unit_test_status": "passed",
+  "onnx_conversion": "output and score parity for batches 1, 7, 32",
+  "benchmark_replay": {
+    "runs": 66,
+    "model_run_comparisons": 264,
+    "alarm_timestamps_match": true,
+    "seconds": 18.149,
+    "scope": "Replay parity, not new validation data"
+  },
+  "browser": {
+    "checks": [
+      "Packaged example displays actual four-model inference",
+      "Truth toggle cannot alter model scores; replay controls work",
+      "Both calibration comparisons and saved acoustic results display",
+      "Ten paper references and qualified dataset plan display",
+      "New inference request, dropout suspension and warm-up display",
+      "CSV download contains all readings; SI-schema import uses actual API",
+      "390 px responsive layout has no horizontal overflow"
+    ],
+    "browser_errors": [],
+    "status": "passed",
+    "url": "http://127.0.0.1:8000"
+  },
+  "startup": {
+    "status": "passed",
+    "serving_environment_has_torch": false,
+    "non_root_verified": false,
+    "dynamic_port": 41077,
+    "methods_loaded": 4,
+    "actual_inference_readings": 720,
+    "scope": "Docker file-set/entrypoint check; no Docker image build performed"
+  },
+  "git_source_commit": "f3acfde210161a396cb1835bcabd2a413ba20e78",
+  "branch": "feat/research-demo",
+  "docker_image_built": false,
+  "validation_scope": "Local prepared-code checks. Public deployment requires a separate live-URL check.",
+  "existing_render_startup": {
+    "status": "passed",
+    "entrypoint": "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT",
+    "serving_environment_has_torch": false,
+    "dynamic_port": 41078,
+    "methods_loaded": 4,
+    "actual_inference_readings": 720,
+    "root_and_template_http": 200,
+    "scope": "Compatibility with the current native Python Render service startup command; clean serving-only environment"
+  },
+  "source_hygiene": {
+    "status": "passed",
+    "tracked_runtime_logs": false,
+    "embedded_legacy_credential_defaults_removed": true,
+    "archived_admin_password_logging_removed": true,
+    "archive_syntax_checks": "passed",
+    "scan_scope": "Exact former credential defaults checked across tracked files; this is not a general secret-scanner guarantee"
+  }
+}

@@ -1,435 +1,252 @@
-"""
-main.py  —  PipeGuard AI v2  —  FastAPI Backend
-"""
-
-import asyncio
-import csv
-import io
+"""Same-origin public research demo. No credentials or training at startup."""
 import json
-from collections import deque
-from datetime import datetime
-from typing import List, Optional
+import sys
+import threading
+import time
+from collections import defaultdict, deque
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Literal
 
-import numpy as np
-from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, Field
-from slowapi import Limiter
-from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
-from slowapi.util import get_remote_address
-from sqlalchemy.orm import Session
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, Response
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-# ── Internal imports ──────────────────────────────────────────────────────────
-from auth import (
-    CreateUserRequest, TokenResponse, UserResponse,
-    get_current_user, hash_password, login_for_access_token, require_role,
-)
-from config import (
-    API_DESCRIPTION, API_TITLE, API_VERSION,
-    DEFAULT_ANOMALY_PROB, FEATURES, HISTORY_MAXLEN,
-    RATE_LIMIT_AUTH, RATE_LIMIT_DEFAULT, RATE_LIMIT_PREDICT, RATE_LIMIT_STREAM,
-    SEQ_LEN, STREAM_INTERVAL,
-)
-from data_simulation import generate_normal_data, get_random_sample, inject_anomalies
+ROOT = Path(__file__).resolve().parents[1]
+# Existing Render services may still launch `cd backend && uvicorn main:app`.
+# Resolve our package from the repository root in that entrypoint as well.
+if not __package__:
+    sys.path.insert(0, str(ROOT))
+from backend.experiments import SCENARIOS, RunStore, create_analysis, create_simulation, run_csv
+from backend.runtime import Runtime
+from backend.simulator import FEATURES
 
-# Import DB models with clear names — no shadowing
-from database import (
-    AnomalyEvent        as DBAnomalyEvent,
-    SensorReading       as DBSensorReading,
-    User                as DBUser,
-    get_db, init_db, seed_admin,
-)
-from predict import predictor
-from preprocessing import df_to_records
-from utils import build_event, format_prediction_response, get_logger, stream_payload
-
-logger = get_logger(__name__)
-
-# ── Rate limiter ──────────────────────────────────────────────────────────────
-limiter = Limiter(key_func=get_remote_address, default_limits=[RATE_LIMIT_DEFAULT])
-
-# ── App ───────────────────────────────────────────────────────────────────────
-app = FastAPI(title=API_TITLE, description=API_DESCRIPTION, version=API_VERSION)
-
-app.state.limiter = limiter
-app.add_exception_handler(
-    RateLimitExceeded,
-    lambda req, exc: __import__("fastapi.responses", fromlist=["JSONResponse"])
-        .JSONResponse(status_code=429, content={"detail": "Rate limit exceeded."})
-)
-app.add_middleware(SlowAPIMiddleware)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-_anomaly_memory: deque = deque(maxlen=HISTORY_MAXLEN)
+MAX_BODY_BYTES = 512_000
 
 
-# ── Startup ───────────────────────────────────────────────────────────────────
-
-@app.on_event("startup")
-def startup_event() -> None:
-    init_db()
-    db = next(get_db())
-    seed_admin(db)
-    ok = predictor.load()
-    if ok:
-        logger.info("PipeGuard AI v2 ready | threshold=%.6f", predictor.threshold)
-    else:
-        logger.warning("Model not loaded — run: python train.py")
+class ScenarioRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    scenario: Literal["healthy", "leak", "gradual_leak", "normal_transient", "sensor_bias", "missing_sensor", "weak_excitation"] = "leak"
+    leak_fraction: Literal[0.02, 0.05, 0.1] = 0.05
+    location: int = Field(default=1, ge=0, le=2)
+    regime: Literal["in_range", "shifted"] = "shifted"
+    seed: int = Field(default=82001, ge=0, le=2_147_483_647)
 
 
-# ── Pydantic schemas (named *Input to avoid clashing with DB models) ───────────
+class Reading(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    timestamp_s: float
+    values: list[float | None] = Field(min_length=8, max_length=8)
 
-class SensorInput(BaseModel):
-    pressure:    float = Field(..., example=74.8)
-    flow_rate:   float = Field(..., example=4.5)
-    temperature: float = Field(..., example=32.1)
-
-
-class SensorSequenceInput(BaseModel):
-    readings: List[SensorInput]
-
-
-class AcknowledgeRequest(BaseModel):
-    notes: Optional[str] = None
-
-
-# ── DB helper ─────────────────────────────────────────────────────────────────
-
-def _save_reading(db: Session, raw: dict, result: dict, source: str = "stream") -> None:
-    try:
-        db.add(DBSensorReading(
-            timestamp     = datetime.utcnow(),
-            pressure      = raw["pressure"],
-            flow_rate     = raw["flow_rate"],
-            temperature   = raw["temperature"],
-            anomaly_score = result.get("anomaly_score", 0.0),
-            score_ratio   = result.get("score_ratio",   0.0),
-            status        = result.get("status",        "Normal"),
-            is_anomaly    = bool(result.get("is_anomaly", False)),
-            source        = source,
-        ))
-        if result.get("is_anomaly"):
-            db.add(DBAnomalyEvent(
-                timestamp     = datetime.utcnow(),
-                pressure      = raw["pressure"],
-                flow_rate     = raw["flow_rate"],
-                temperature   = raw["temperature"],
-                anomaly_score = result.get("anomaly_score", 0.0),
-                score_ratio   = result.get("score_ratio",   0.0),
-                status        = result.get("status",        "Leak Detected"),
-                source        = source,
-            ))
-            _anomaly_memory.append(build_event(raw, result))
-        db.commit()
-    except Exception as exc:
-        db.rollback()
-        logger.error("DB write error: %s", exc)
+    @field_validator("values")
+    @classmethod
+    def physical_units(cls, values):
+        # Reject impossible units, but preserve explicit missing sensors.
+        for i in (0, 1, 2, 6):
+            if values[i] is not None and not 10_000 <= values[i] <= 20_000_000:
+                raise ValueError("Pressures must be absolute Pa between 10 kPa and 20 MPa")
+        if values[5] is not None and not 150 <= values[5] <= 500:
+            raise ValueError("Temperature must be Kelvin between 150 and 500")
+        for i in (3, 4):
+            if values[i] is not None and not -100 <= values[i] <= 100:
+                raise ValueError("Mass flows must be kg/s between -100 and 100")
+        if values[7] is not None and not 0 <= values[7] <= 2:
+            raise ValueError("Valve command must be dimensionless between 0 and 2")
+        return values
 
 
-# ── Auth endpoints ────────────────────────────────────────────────────────────
-
-@app.post("/auth/login", response_model=TokenResponse, tags=["Auth"])
-@limiter.limit(RATE_LIMIT_AUTH)
-def login(
-    request:   Request,
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db:        Session                   = Depends(get_db),
-):
-    return login_for_access_token(form_data, db)
+class AnalysisRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    readings: list[Reading] = Field(min_length=32, max_length=1200)
 
 
-@app.get("/auth/me", response_model=UserResponse, tags=["Auth"])
-def me(current_user: DBUser = Depends(get_current_user)):
-    return current_user
+class RateLimit:
+    """Bounded per-client compute allowance, not a persistent identity system."""
+    def __init__(self):
+        self.clients = defaultdict(deque)
+        self.lock = threading.Lock()
+
+    def accept(self, client):
+        with self.lock:
+            now = time.monotonic()
+            # Evict expired addresses as well as old timestamps.
+            for key in list(self.clients):
+                queue = self.clients[key]
+                while queue and now - queue[0] > 600:
+                    queue.popleft()
+                if not queue:
+                    del self.clients[key]
+            if len(self.clients) >= 1000 and client not in self.clients:
+                return False
+            queue = self.clients[client]
+            if len(queue) >= 20:
+                return False
+            queue.append(now)
+            return True
 
 
-@app.post("/auth/users", response_model=UserResponse, tags=["Auth"])
-def create_user(
-    payload:      CreateUserRequest,
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(require_role("admin")),
-):
-    from database import User as DBUser2
-    if db.query(DBUser2).filter(DBUser2.username == payload.username).first():
-        raise HTTPException(status_code=400, detail="Username already exists.")
-    user = DBUser2(
-        username        = payload.username,
-        hashed_password = hash_password(payload.password),
-        full_name       = payload.full_name,
-        role            = payload.role,
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
+def create_app():
+    @asynccontextmanager
+    async def lifespan(app):
+        app.state.runtime = Runtime(ROOT / "deployment/models")
+        app.state.runs = RunStore()
+        app.state.compute = threading.BoundedSemaphore(1)
+        app.state.limiter = RateLimit()
+        yield
 
+    app = FastAPI(title="PipeGuard Research Lab", version="2.0.0", lifespan=lifespan, docs_url=None, redoc_url=None)
 
-@app.get("/auth/users", response_model=List[UserResponse], tags=["Auth"])
-def list_users(
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(require_role("admin")),
-):
-    from database import User as DBUser2
-    return db.query(DBUser2).all()
+    @app.middleware("http")
+    async def request_bounds(request, call_next):
+        # Check the actual stream length, including requests without Content-Length.
+        if request.method == "POST":
+            chunks, length = [], 0
+            async for chunk in request.stream():
+                length += len(chunk)
+                if length > MAX_BODY_BYTES:
+                    return Response("Request exceeds 512 kB", status_code=413)
+                chunks.append(chunk)
+            request._body = b"".join(chunks)
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        script_policy = "'self'"
+        style_policy = "'self' 'unsafe-inline'"
+        # Only optional Swagger docs use a CDN, with a nonced initializer.
+        if request.url.path == "/docs" and hasattr(request.state, "docs_nonce"):
+            script_policy += f" https://cdn.jsdelivr.net 'nonce-{request.state.docs_nonce}'"
+            style_policy += " https://cdn.jsdelivr.net"
+        response.headers["Content-Security-Policy"] = f"default-src 'self'; script-src {script_policy}; style-src {style_policy}; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+        response.headers["Cache-Control"] = "no-store" if request.url.path.startswith("/api/runs") else "no-cache"
+        return response
 
+    @app.get("/docs", include_in_schema=False)
+    def api_docs(request: Request):
+        import secrets
+        from fastapi.openapi.docs import get_swagger_ui_html
+        from fastapi.responses import HTMLResponse
+        request.state.docs_nonce = secrets.token_urlsafe(18)
+        html = get_swagger_ui_html(openapi_url="/openapi.json", title="PipeGuard · API", swagger_favicon_url="/assets/icon.svg")
+        body = html.body.decode().replace("<script>", f'<script nonce="{request.state.docs_nonce}">')
+        return HTMLResponse(body)
 
-# ── System endpoints ──────────────────────────────────────────────────────────
+    @app.get("/", include_in_schema=False)
+    def dashboard():
+        return FileResponse(ROOT / "frontend/index.html")
 
-@app.get("/health", tags=["System"])
-def health(db: Session = Depends(get_db)):
-    total_readings = db.query(DBSensorReading).count()
-    total_events   = db.query(DBAnomalyEvent).count()
-    unacked        = db.query(DBAnomalyEvent).filter(DBAnomalyEvent.acknowledged == False).count()
-    return {
-        "status":         "ok",
-        "version":        API_VERSION,
-        "model_loaded":   predictor.is_ready,
-        "threshold":      predictor.threshold,
-        "total_readings": total_readings,
-        "total_events":   total_events,
-        "unacknowledged": unacked,
-    }
+    @app.get("/login.html", include_in_schema=False)
+    def former_login():
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse("/", status_code=307)
 
+    @app.get("/health")
+    def health(request: Request):
+        ready = hasattr(request.app.state, "runtime")
+        if not ready:
+            raise HTTPException(503, "Models are not ready")
+        return {"status": "ready", "version": "2.0.0", "models_loaded": 4,
+                "neural_runtime": "ONNX CPU", "scope": "simulation research demo"}
 
-@app.get("/metrics", tags=["System"])
-def metrics(
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(get_current_user),
-):
-    from sqlalchemy import func
-    total     = db.query(DBSensorReading).count()
-    leaks     = db.query(DBSensorReading).filter(DBSensorReading.is_anomaly == True).count()
-    avg_score = db.query(func.avg(DBSensorReading.anomaly_score)).scalar() or 0.0
-    return {
-        "total_readings":    total,
-        "total_anomalies":   leaks,
-        "anomaly_rate_pct":  round(100 * leaks / total, 2) if total else 0.0,
-        "avg_anomaly_score": round(avg_score, 6),
-        "unacknowledged":    db.query(DBAnomalyEvent).filter(DBAnomalyEvent.acknowledged == False).count(),
-    }
+    @app.get("/api/config")
+    def config(request: Request):
+        return {"models": request.app.state.runtime.config, "scenarios": SCENARIOS,
+                "max_readings": 1200, "run_expiry_s": 3600}
 
-
-# ── Simulation endpoints ──────────────────────────────────────────────────────
-
-@app.get("/simulate", tags=["Data"])
-@limiter.limit(RATE_LIMIT_DEFAULT)
-def simulate(
-    request:      Request,
-    anomaly:      bool   = Query(False),
-    current_user: DBUser = Depends(get_current_user),
-):
-    return {"reading": get_random_sample(anomaly=anomaly), "forced_anomaly": anomaly}
-
-
-@app.get("/simulate/sequence", tags=["Data"])
-@limiter.limit(RATE_LIMIT_DEFAULT)
-def simulate_sequence(
-    request:      Request,
-    n:            int    = Query(80, ge=10, le=500),
-    with_anomaly: bool   = Query(True),
-    current_user: DBUser = Depends(get_current_user),
-):
-    normal_df = generate_normal_data(n_samples=n)
-    full_df   = inject_anomalies(normal_df) if with_anomaly else normal_df.copy()
-    if not with_anomaly:
-        full_df["is_anomaly"] = 0
-    return {"data": df_to_records(full_df), "count": len(full_df)}
-
-
-# ── Prediction endpoints ──────────────────────────────────────────────────────
-
-@app.post("/predict", tags=["Inference"])
-@limiter.limit(RATE_LIMIT_PREDICT)
-def predict(
-    request:      Request,
-    payload:      SensorSequenceInput,
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(get_current_user),
-):
-    if not predictor.is_ready:
-        raise HTTPException(status_code=503, detail="Model not loaded. Run: python train.py")
-    if len(payload.readings) < SEQ_LEN:
-        raise HTTPException(status_code=400, detail=f"Need at least {SEQ_LEN} readings.")
-    readings = [r.dict() for r in payload.readings]
-    result   = predictor.infer_batch(readings)
-    _save_reading(db, readings[-1], result, source="manual")
-    return format_prediction_response(result, readings[-1])
-
-
-@app.post("/predict/single", tags=["Inference"])
-@limiter.limit(RATE_LIMIT_PREDICT)
-def predict_single(
-    request:      Request,
-    reading:      SensorInput,
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(get_current_user),
-):
-    if not predictor.is_ready:
-        raise HTTPException(status_code=503, detail="Model not loaded.")
-    raw    = reading.dict()
-    result = predictor.infer_reading(raw)
-    _save_reading(db, raw, result, source="manual")
-    return format_prediction_response(result, raw)
-
-
-# ── Event / history endpoints ─────────────────────────────────────────────────
-
-@app.get("/events", tags=["Events"])
-def get_events(
-    limit:        int    = Query(50, ge=1, le=500),
-    unacked_only: bool   = Query(False),
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(get_current_user),
-):
-    q = db.query(DBAnomalyEvent)
-    if unacked_only:
-        q = q.filter(DBAnomalyEvent.acknowledged == False)
-    events = q.order_by(DBAnomalyEvent.timestamp.desc()).limit(limit).all()
-    return {
-        "events": [e.to_dict() for e in events],
-        "total":  db.query(DBAnomalyEvent).count(),
-        "unacknowledged": db.query(DBAnomalyEvent).filter(DBAnomalyEvent.acknowledged == False).count(),
-    }
-
-
-@app.post("/events/{event_id}/acknowledge", tags=["Events"])
-def acknowledge_event(
-    event_id:     int,
-    payload:      AcknowledgeRequest,
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(get_current_user),
-):
-    event = db.query(DBAnomalyEvent).filter(DBAnomalyEvent.id == event_id).first()
-    if not event:
-        raise HTTPException(status_code=404, detail=f"Event {event_id} not found.")
-    if event.acknowledged:
-        raise HTTPException(status_code=400, detail="Already acknowledged.")
-    event.acknowledged    = True
-    event.acknowledged_by = current_user.username
-    event.acknowledged_at = datetime.utcnow()
-    event.notes           = payload.notes
-    db.commit()
-    return {"ok": True, "event": event.to_dict()}
-
-
-@app.get("/history", tags=["Events"])
-def history(
-    limit:        int     = Query(50, ge=1, le=200),
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(get_current_user),
-):
-    events = db.query(DBAnomalyEvent).order_by(DBAnomalyEvent.timestamp.desc()).limit(limit).all()
-    return {"events": [e.to_dict() for e in events], "total": db.query(DBAnomalyEvent).count()}
-
-
-# ── Export endpoints ──────────────────────────────────────────────────────────
-
-@app.get("/export/readings.csv", tags=["Export"])
-def export_readings(
-    limit:        int     = Query(10000, ge=1, le=100000),
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(get_current_user),
-):
-    rows = db.query(DBSensorReading).order_by(DBSensorReading.timestamp.desc()).limit(limit).all()
-    buf  = io.StringIO()
-    w    = csv.writer(buf)
-    w.writerow(["id","timestamp","pressure","flow_rate","temperature",
-                "anomaly_score","score_ratio","status","is_anomaly","source"])
-    for r in rows:
-        w.writerow([r.id, r.timestamp.isoformat(), r.pressure, r.flow_rate,
-                    r.temperature, r.anomaly_score, r.score_ratio,
-                    r.status, int(r.is_anomaly), r.source])
-    buf.seek(0)
-    return StreamingResponse(
-        iter([buf.getvalue()]), media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=pipeguard_readings.csv"},
-    )
-
-
-@app.get("/export/events.csv", tags=["Export"])
-def export_events(
-    db:           Session = Depends(get_db),
-    current_user: DBUser  = Depends(get_current_user),
-):
-    events = db.query(DBAnomalyEvent).order_by(DBAnomalyEvent.timestamp.desc()).all()
-    buf    = io.StringIO()
-    w      = csv.writer(buf)
-    w.writerow(["id","timestamp","pressure","flow_rate","temperature",
-                "anomaly_score","score_ratio","status","acknowledged",
-                "acknowledged_by","acknowledged_at","notes"])
-    for e in events:
-        w.writerow([e.id, e.timestamp.isoformat(), e.pressure, e.flow_rate,
-                    e.temperature, e.anomaly_score, e.score_ratio, e.status,
-                    e.acknowledged, e.acknowledged_by or "",
-                    e.acknowledged_at.isoformat() if e.acknowledged_at else "",
-                    e.notes or ""])
-    buf.seek(0)
-    return StreamingResponse(
-        iter([buf.getvalue()]), media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=pipeguard_events.csv"},
-    )
-
-
-# ── SSE Stream ────────────────────────────────────────────────────────────────
-
-@app.get("/stream", tags=["Stream"])
-@limiter.limit(RATE_LIMIT_STREAM)
-async def stream(
-    request:      Request,
-    anomaly_prob: float          = Query(DEFAULT_ANOMALY_PROB, ge=0.0, le=1.0),
-    token:        Optional[str]  = Query(None),
-):
-    if not predictor.is_ready:
-        raise HTTPException(status_code=503, detail="Model not loaded.")
-
-    # Resolve username from optional token
-    username = "anonymous"
-    if token:
+    def compute(request, factory, payload):
+        client = request.client.host if request.client else "unknown"
+        if not request.app.state.limiter.accept(client):
+            raise HTTPException(429, "Compute limit reached. Try again in ten minutes.", headers={"Retry-After": "600"})
+        semaphore = request.app.state.compute
+        if not semaphore.acquire(blocking=False):
+            raise HTTPException(503, "Another experiment is running. Try again shortly.", headers={"Retry-After": "5"})
         try:
-            from jose import jwt as jose_jwt
-            from config import SECRET_KEY, ALGORITHM
-            payload  = jose_jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            username = payload.get("sub", "anonymous")
-        except Exception:
-            pass
+            started = time.perf_counter()
+            result = factory(request.app.state.runtime, payload)
+            result["compute_seconds"] = round(time.perf_counter() - started, 3)
+            return request.app.state.runs.add(result)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        finally:
+            semaphore.release()
 
-    async def event_generator():
-        rng = np.random.default_rng()
-        predictor.reset_buffer()
-        db  = next(get_db())
-        logger.info("SSE connected | user=%s | anomaly_prob=%.2f", username, anomaly_prob)
-        try:
-            while True:
-                raw    = get_random_sample(anomaly=bool(rng.random() < anomaly_prob))
-                result = predictor.infer_reading(raw)
-                data   = stream_payload(raw, result, predictor.buffer_size, SEQ_LEN)
-                if result.get("is_anomaly"):
-                    _save_reading(db, raw, result, source="stream")
-                    logger.info(
-                        "Stream anomaly | user=%s | score=%.6f | P=%.1f | F=%.1f",
-                        username, result["anomaly_score"], raw["pressure"], raw["flow_rate"],
-                    )
-                yield f"data: {json.dumps(data)}\n\n"
-                await asyncio.sleep(STREAM_INTERVAL)
-        except asyncio.CancelledError:
-            logger.info("SSE disconnected | user=%s", username)
-            db.close()
-            raise
+    @app.post("/api/runs", status_code=201)
+    def new_run(payload: ScenarioRequest, request: Request):
+        return compute(request, create_simulation, payload)
 
-    return StreamingResponse(
-        event_generator(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control":     "no-cache",
-            "X-Accel-Buffering": "no",
-            "Connection":        "keep-alive",
-        },
-    )
+    @app.post("/api/analyze", status_code=201)
+    def analyze(payload: AnalysisRequest, request: Request):
+        return compute(request, create_analysis, payload)
+
+    def get_run(request, run_id):
+        if run_id == "example":
+            return json.loads((ROOT / "deployment/evidence/example.json").read_text())
+        run = request.app.state.runs.get(run_id)
+        if run is None:
+            raise HTTPException(404, "Run expired or not found. Generate it again with the same seed.")
+        return run
+
+    @app.get("/api/example")
+    def example():
+        return FileResponse(ROOT / "deployment/evidence/example.json", media_type="application/json")
+
+    @app.get("/api/runs/{run_id}")
+    def run_detail(run_id: str, request: Request):
+        return get_run(request, run_id)
+
+    @app.get("/api/runs/{run_id}/export.csv")
+    def csv_export(run_id: str, request: Request):
+        content = run_csv(get_run(request, run_id))
+        return Response(content, media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="pipeguard-{run_id}.csv"'})
+
+    @app.get("/api/runs/{run_id}/export.json")
+    def json_export(run_id: str, request: Request):
+        content = json.dumps(get_run(request, run_id), allow_nan=False, indent=2)
+        return Response(content, media_type="application/json", headers={"Content-Disposition": f'attachment; filename="pipeguard-{run_id}.json"'})
+
+    @app.get("/api/evidence")
+    def evidence():
+        root = ROOT / "deployment/evidence"
+        final = json.loads((root / "regime_results.json").read_text())
+        acoustic = json.loads((root / "acoustic_results.json").read_text())
+        return {
+            "simulation": {"summaries": final["summaries"], "protocol": final["protocol"],
+                           "event_definition": final["event_definition"], "test_seed_range": final["test_seed_range"]},
+            "acoustic": {"summaries": acoustic["summaries"], "audit": acoustic["audit"], "scope": acoustic["scope"]},
+            "references": json.loads((root / "publication_references.json").read_text()),
+            "datasets": json.loads((root / "dataset_qualification.json").read_text()),
+            "manifest": json.loads((ROOT / "deployment/models/manifest.json").read_text()),
+            "runtime_validation": json.loads((root / "validation.json").read_text()),
+        }
+
+    files = {
+        "report": "research-report.pdf", "results": "regime_results.json",
+        "primary-results": "benchmark_results.json", "acoustic-results": "acoustic_results.json",
+        "paper-mapping": "PAPER_MAPPING.md", "data-access": "DATA_ACCESS.md",
+        "reading-ledger": "paper_reading_ledger.json", "source-audit": "source_audit.json",
+        "validation": "validation.json",
+    }
+
+    @app.get("/api/download/{name}")
+    def download(name: str):
+        if name not in files:
+            raise HTTPException(404, "Unknown evidence file")
+        return FileResponse(ROOT / "deployment/evidence" / files[name], filename=files[name])
+
+    @app.get("/api/template.csv")
+    def template():
+        from backend.simulator import simulate
+        run = simulate("template", 82002, "healthy")
+        import csv
+        import io
+        out = io.StringIO()
+        writer = csv.writer(out)
+        writer.writerow(["timestamp_s", *FEATURES])
+        writer.writerows([[int(t), *map(float, x)] for t, x in zip(run["time_s"][:120], run["x"][:120])])
+        return Response(out.getvalue(), media_type="text/csv", headers={"Content-Disposition": 'attachment; filename="pipeguard-sensor-template.csv"'})
+
+    app.mount("/assets", StaticFiles(directory=ROOT / "frontend"), name="assets")
+    return app
+
+
+app = create_app()

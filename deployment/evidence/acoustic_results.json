@@ -1,0 +1,1192 @@
+{
+  "scope": "SMALL REAL GAS ACOUSTIC PILOT, not pressure/flow SCADA",
+  "audit": {
+    "clips": 150,
+    "unique_hashes": 150,
+    "duration_s": 150,
+    "train_prefixes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "validation_prefixes": [
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "test_prefixes": [
+      20,
+      21,
+      22,
+      23,
+      24
+    ],
+    "per_split_counts": {
+      "train": 90,
+      "validation": 30,
+      "test": 30
+    },
+    "feature_frame_seconds": 0.005333333333333333,
+    "maximum_clipped_fraction": 0.01284375,
+    "limitation": "Prefix blocks are provisional. Acquisition sessions, pressure and SNR metadata are unavailable. This is not a session-held-out or field test."
+  },
+  "summaries": [
+    {
+      "model": "dynamic_residual",
+      "threshold": 1.0830538272857666,
+      "test_clips": 30,
+      "healthy_test_clips": 10,
+      "leak_test_clips": 20,
+      "true_negative": 9,
+      "false_positive": 1,
+      "false_negative": 0,
+      "true_positive": 20,
+      "leak_clip_recall": 1.0,
+      "recall_95pct_ci": [
+        0.8315665290169145,
+        1.0
+      ],
+      "healthy_clip_false_positive_rate": 0.1,
+      "false_positive_rate_95pct_ci": [
+        0.0025285785444625728,
+        0.44501611702819543
+      ],
+      "average_precision": 1.0000000000000002,
+      "roc_auc": 1.0
+    },
+    {
+      "model": "cnn_lstm",
+      "threshold": 0.9786661863327026,
+      "test_clips": 30,
+      "healthy_test_clips": 10,
+      "leak_test_clips": 20,
+      "true_negative": 10,
+      "false_positive": 0,
+      "false_negative": 12,
+      "true_positive": 8,
+      "leak_clip_recall": 0.4,
+      "recall_95pct_ci": [
+        0.19119006072557054,
+        0.6394574126927552
+      ],
+      "healthy_clip_false_positive_rate": 0.0,
+      "false_positive_rate_95pct_ci": [
+        0.0,
+        0.30849710781876294
+      ],
+      "average_precision": 0.9617504757722151,
+      "roc_auc": 0.9099999999999999
+    },
+    {
+      "model": "hybrid",
+      "threshold": 1.0,
+      "test_clips": 30,
+      "healthy_test_clips": 10,
+      "leak_test_clips": 20,
+      "true_negative": 7,
+      "false_positive": 3,
+      "false_negative": 0,
+      "true_positive": 20,
+      "leak_clip_recall": 1.0,
+      "recall_95pct_ci": [
+        0.8315665290169145,
+        1.0
+      ],
+      "healthy_clip_false_positive_rate": 0.3,
+      "false_positive_rate_95pct_ci": [
+        0.06673951117773447,
+        0.652452850060008
+      ],
+      "average_precision": 1.0000000000000002,
+      "roc_auc": 1.0
+    }
+  ],
+  "test_predictions": [
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 0,
+      "score": 1.0874509811401367,
+      "prediction": 1,
+      "sha256": "d34ec90edfc3242917ad17c6323c7fc34bedc1987f8ffc51169c64f7727d3ae1"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 0,
+      "score": 1.0592113733291626,
+      "prediction": 0,
+      "sha256": "b9492d12bd84290ec32dbfbdde4ea970f97a5287a4fa5b7806c66ff04b95cf0f"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 0,
+      "score": 1.0631694793701172,
+      "prediction": 0,
+      "sha256": "d89f40c72c84973cea27c0fa7715a04504d510069952e81e11c0382ea0572943"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 0,
+      "score": 1.0777968168258667,
+      "prediction": 0,
+      "sha256": "c2ff1e590165b2643fc80755b128ec14651092656b3814975b8200097f4520d9"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 0,
+      "score": 0.9991956353187561,
+      "prediction": 0,
+      "sha256": "f1848faf52e7789e5a40ddec3a15da3fdec1d078009b68fa88ee77c6a2b1c50b"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 0,
+      "score": 1.010852575302124,
+      "prediction": 0,
+      "sha256": "4d2c827918edb6e16cfd37105a9662909b0e78cc7d07e755b190d80c1ef1c207"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 0,
+      "score": 1.0167357921600342,
+      "prediction": 0,
+      "sha256": "4b4f0b5ac1307db67e90bb38ae211c8975a5807e390495b604369dfd40b443cf"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 0,
+      "score": 1.0817099809646606,
+      "prediction": 0,
+      "sha256": "3d91dd5640b0d52adc91a4bf10436c524fab044aa8290181dcd30b7834ee1a8b"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 0,
+      "score": 1.082414984703064,
+      "prediction": 0,
+      "sha256": "47ff155eb9e3f7c259575d4ec8fe83bf1e96b23a483895a523b871775deeb3fd"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 0,
+      "score": 0.9711572527885437,
+      "prediction": 0,
+      "sha256": "a5da5fc1509a3d235ea0efa3f68c99da341bbe86ec5c86ec65ef582162f6ab49"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 1,
+      "score": 1.3056713342666626,
+      "prediction": 1,
+      "sha256": "bfa1c939dd91ef5c6dca3f1f0b3789e3b4bcd1b4a39e515c7d57a0b4094d858d"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 1,
+      "score": 1.290450096130371,
+      "prediction": 1,
+      "sha256": "745aec4eb98276c72dd6d032ed4faf94e07129ffffc2994acb7cac9d4d8ed8bd"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 1,
+      "score": 10.293022155761719,
+      "prediction": 1,
+      "sha256": "bcf9a923b06a438ef75a0041ed7e39875c75d4598b9d313655c1196fc0f8bd37"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 1,
+      "score": 10.4404296875,
+      "prediction": 1,
+      "sha256": "53c8c20c9c6433fbc4bb01fa53e3d6e85d51f7f6ed7215b1424b136c87b26eba"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 1,
+      "score": 11.398612022399902,
+      "prediction": 1,
+      "sha256": "7b9d1e8df06f8ade52071a06516f90017771c6cdf7114daa5bc8b985de88292a"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 1,
+      "score": 11.480989456176758,
+      "prediction": 1,
+      "sha256": "f0b605a7b63328309612e697b3a0e9c82bef442ac17de4d5325c9bd4e487774a"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 1,
+      "score": 2.6034789085388184,
+      "prediction": 1,
+      "sha256": "aa023edc0ea90b03657c89d1ce1bff987ff794f82b1cbe614429df75f5477f9f"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 1,
+      "score": 2.6482386589050293,
+      "prediction": 1,
+      "sha256": "eb54e0be86905dd25ae8007a02c00e6f98f9464c415b327079db9728352da3ca"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 1,
+      "score": 4.443255424499512,
+      "prediction": 1,
+      "sha256": "2870916a4af82ceb4cc23ed8722d2afd39de47f76c716e856d547a82538f53e6"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "hole_blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 1,
+      "score": 4.289872646331787,
+      "prediction": 1,
+      "sha256": "c8ff5c0c0e0616fbc773d750b0abb2117223738c717eaacf6ada31c5e6db4726"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 1,
+      "score": 10.16491413116455,
+      "prediction": 1,
+      "sha256": "8f420ea360926885557f2f4925f83f1956dacd8656bac092bf6f139e90bb2594"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 1,
+      "score": 1.9583138227462769,
+      "prediction": 1,
+      "sha256": "2c068f38c8124ca029695fef145c3e889db1f5f6d40ce39220f73e18ad1f8695"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 1,
+      "score": 16.64114761352539,
+      "prediction": 1,
+      "sha256": "8310051fde644e71bfc0369221462a4ad883720b43c81c33b83141319321c950"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 1,
+      "score": 5.557152271270752,
+      "prediction": 1,
+      "sha256": "95abedee2851b714a694c0ba9bf59b2af6bd7a0f9e9ae80cc9810e1dba54fc36"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 1,
+      "score": 5.084084510803223,
+      "prediction": 1,
+      "sha256": "68bde7ec1987fe9c6aaa5037cc1d2eed32b480977125926459aedea0ad100660"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 1,
+      "score": 3.0395379066467285,
+      "prediction": 1,
+      "sha256": "f976454476abde9794815de9ea29ff22abab9a9759329cbb386d2928bc88a28e"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 1,
+      "score": 1.1094220876693726,
+      "prediction": 1,
+      "sha256": "78b054e16d7e62f6062e672181b020e10495374ff40c98537a29da4cd8e02f6b"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 1,
+      "score": 1.1781293153762817,
+      "prediction": 1,
+      "sha256": "767bfb9e90141a61b6a3da0bd67fb5a1e0f15031509fd037832baa39fb7dc4db"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 1,
+      "score": 1.398564338684082,
+      "prediction": 1,
+      "sha256": "82bdd31f024f0c9c3ecb1d032ca12fd7c08012ddd9b885a8e17865d01b116e6b"
+    },
+    {
+      "model": "dynamic_residual",
+      "category": "valve_blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 1,
+      "score": 1.3370403051376343,
+      "prediction": 1,
+      "sha256": "0a3c87f828959d9b6e62d6e4235ab873769566c284207593c9a52f63ceab9e0d"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 0,
+      "score": 0.19954942166805267,
+      "prediction": 0,
+      "sha256": "d34ec90edfc3242917ad17c6323c7fc34bedc1987f8ffc51169c64f7727d3ae1"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 0,
+      "score": 0.1793910562992096,
+      "prediction": 0,
+      "sha256": "b9492d12bd84290ec32dbfbdde4ea970f97a5287a4fa5b7806c66ff04b95cf0f"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 0,
+      "score": 0.2288479506969452,
+      "prediction": 0,
+      "sha256": "d89f40c72c84973cea27c0fa7715a04504d510069952e81e11c0382ea0572943"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 0,
+      "score": 0.2459176480770111,
+      "prediction": 0,
+      "sha256": "c2ff1e590165b2643fc80755b128ec14651092656b3814975b8200097f4520d9"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 0,
+      "score": 0.30484089255332947,
+      "prediction": 0,
+      "sha256": "f1848faf52e7789e5a40ddec3a15da3fdec1d078009b68fa88ee77c6a2b1c50b"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 0,
+      "score": 0.2945525050163269,
+      "prediction": 0,
+      "sha256": "4d2c827918edb6e16cfd37105a9662909b0e78cc7d07e755b190d80c1ef1c207"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 0,
+      "score": 0.17349210381507874,
+      "prediction": 0,
+      "sha256": "4b4f0b5ac1307db67e90bb38ae211c8975a5807e390495b604369dfd40b443cf"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 0,
+      "score": 0.19923168420791626,
+      "prediction": 0,
+      "sha256": "3d91dd5640b0d52adc91a4bf10436c524fab044aa8290181dcd30b7834ee1a8b"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 0,
+      "score": 0.20955324172973633,
+      "prediction": 0,
+      "sha256": "47ff155eb9e3f7c259575d4ec8fe83bf1e96b23a483895a523b871775deeb3fd"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 0,
+      "score": 0.1794164776802063,
+      "prediction": 0,
+      "sha256": "a5da5fc1509a3d235ea0efa3f68c99da341bbe86ec5c86ec65ef582162f6ab49"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 1,
+      "score": 0.21925468742847443,
+      "prediction": 0,
+      "sha256": "bfa1c939dd91ef5c6dca3f1f0b3789e3b4bcd1b4a39e515c7d57a0b4094d858d"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 1,
+      "score": 0.19553284347057343,
+      "prediction": 0,
+      "sha256": "745aec4eb98276c72dd6d032ed4faf94e07129ffffc2994acb7cac9d4d8ed8bd"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 1,
+      "score": 1.431136965751648,
+      "prediction": 1,
+      "sha256": "bcf9a923b06a438ef75a0041ed7e39875c75d4598b9d313655c1196fc0f8bd37"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 1,
+      "score": 1.4898121356964111,
+      "prediction": 1,
+      "sha256": "53c8c20c9c6433fbc4bb01fa53e3d6e85d51f7f6ed7215b1424b136c87b26eba"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 1,
+      "score": 1.6372870206832886,
+      "prediction": 1,
+      "sha256": "7b9d1e8df06f8ade52071a06516f90017771c6cdf7114daa5bc8b985de88292a"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 1,
+      "score": 1.6475820541381836,
+      "prediction": 1,
+      "sha256": "f0b605a7b63328309612e697b3a0e9c82bef442ac17de4d5325c9bd4e487774a"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 1,
+      "score": 0.3472944498062134,
+      "prediction": 0,
+      "sha256": "aa023edc0ea90b03657c89d1ce1bff987ff794f82b1cbe614429df75f5477f9f"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 1,
+      "score": 0.370029091835022,
+      "prediction": 0,
+      "sha256": "eb54e0be86905dd25ae8007a02c00e6f98f9464c415b327079db9728352da3ca"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 1,
+      "score": 0.6123254895210266,
+      "prediction": 0,
+      "sha256": "2870916a4af82ceb4cc23ed8722d2afd39de47f76c716e856d547a82538f53e6"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "hole_blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 1,
+      "score": 0.5764589309692383,
+      "prediction": 0,
+      "sha256": "c8ff5c0c0e0616fbc773d750b0abb2117223738c717eaacf6ada31c5e6db4726"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 1,
+      "score": 2.063052177429199,
+      "prediction": 1,
+      "sha256": "8f420ea360926885557f2f4925f83f1956dacd8656bac092bf6f139e90bb2594"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 1,
+      "score": 0.3446010947227478,
+      "prediction": 0,
+      "sha256": "2c068f38c8124ca029695fef145c3e889db1f5f6d40ce39220f73e18ad1f8695"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 1,
+      "score": 2.691969156265259,
+      "prediction": 1,
+      "sha256": "8310051fde644e71bfc0369221462a4ad883720b43c81c33b83141319321c950"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 1,
+      "score": 1.3110707998275757,
+      "prediction": 1,
+      "sha256": "95abedee2851b714a694c0ba9bf59b2af6bd7a0f9e9ae80cc9810e1dba54fc36"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 1,
+      "score": 1.2158197164535522,
+      "prediction": 1,
+      "sha256": "68bde7ec1987fe9c6aaa5037cc1d2eed32b480977125926459aedea0ad100660"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 1,
+      "score": 0.9200651049613953,
+      "prediction": 0,
+      "sha256": "f976454476abde9794815de9ea29ff22abab9a9759329cbb386d2928bc88a28e"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 1,
+      "score": 0.21744652092456818,
+      "prediction": 0,
+      "sha256": "78b054e16d7e62f6062e672181b020e10495374ff40c98537a29da4cd8e02f6b"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 1,
+      "score": 0.2443467378616333,
+      "prediction": 0,
+      "sha256": "767bfb9e90141a61b6a3da0bd67fb5a1e0f15031509fd037832baa39fb7dc4db"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 1,
+      "score": 0.34726178646087646,
+      "prediction": 0,
+      "sha256": "82bdd31f024f0c9c3ecb1d032ca12fd7c08012ddd9b885a8e17865d01b116e6b"
+    },
+    {
+      "model": "cnn_lstm",
+      "category": "valve_blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 1,
+      "score": 0.3179134130477905,
+      "prediction": 0,
+      "sha256": "0a3c87f828959d9b6e62d6e4235ab873769566c284207593c9a52f63ceab9e0d"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 0,
+      "score": 1.0040599587422074,
+      "prediction": 1,
+      "sha256": "d34ec90edfc3242917ad17c6323c7fc34bedc1987f8ffc51169c64f7727d3ae1"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 0,
+      "score": 0.9782791529410935,
+      "prediction": 0,
+      "sha256": "b9492d12bd84290ec32dbfbdde4ea970f97a5287a4fa5b7806c66ff04b95cf0f"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 0,
+      "score": 0.9823217226219532,
+      "prediction": 0,
+      "sha256": "d89f40c72c84973cea27c0fa7715a04504d510069952e81e11c0382ea0572943"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 0,
+      "score": 0.9965545003325447,
+      "prediction": 0,
+      "sha256": "c2ff1e590165b2643fc80755b128ec14651092656b3814975b8200097f4520d9"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 0,
+      "score": 0.9265650185101626,
+      "prediction": 0,
+      "sha256": "f1848faf52e7789e5a40ddec3a15da3fdec1d078009b68fa88ee77c6a2b1c50b"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 0,
+      "score": 0.9360537574676471,
+      "prediction": 0,
+      "sha256": "4d2c827918edb6e16cfd37105a9662909b0e78cc7d07e755b190d80c1ef1c207"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 0,
+      "score": 0.9408995494745156,
+      "prediction": 0,
+      "sha256": "4b4f0b5ac1307db67e90bb38ae211c8975a5807e390495b604369dfd40b443cf"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 0,
+      "score": 1.0003398757111015,
+      "prediction": 1,
+      "sha256": "3d91dd5640b0d52adc91a4bf10436c524fab044aa8290181dcd30b7834ee1a8b"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 0,
+      "score": 1.00124771757971,
+      "prediction": 1,
+      "sha256": "47ff155eb9e3f7c259575d4ec8fe83bf1e96b23a483895a523b871775deeb3fd"
+    },
+    {
+      "model": "hybrid",
+      "category": "blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 0,
+      "score": 0.8991112079279785,
+      "prediction": 0,
+      "sha256": "a5da5fc1509a3d235ea0efa3f68c99da341bbe86ec5c86ec65ef582162f6ab49"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 1,
+      "score": 1.21226610669672,
+      "prediction": 1,
+      "sha256": "bfa1c939dd91ef5c6dca3f1f0b3789e3b4bcd1b4a39e515c7d57a0b4094d858d"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 1,
+      "score": 1.1984048441163304,
+      "prediction": 1,
+      "sha256": "745aec4eb98276c72dd6d032ed4faf94e07129ffffc2994acb7cac9d4d8ed8bd"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 1,
+      "score": 9.565526394496374,
+      "prediction": 1,
+      "sha256": "bcf9a923b06a438ef75a0041ed7e39875c75d4598b9d313655c1196fc0f8bd37"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 1,
+      "score": 9.702741373765939,
+      "prediction": 1,
+      "sha256": "53c8c20c9c6433fbc4bb01fa53e3d6e85d51f7f6ed7215b1424b136c87b26eba"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 1,
+      "score": 10.592700245828365,
+      "prediction": 1,
+      "sha256": "7b9d1e8df06f8ade52071a06516f90017771c6cdf7114daa5bc8b985de88292a"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 1,
+      "score": 10.668754794832699,
+      "prediction": 1,
+      "sha256": "f0b605a7b63328309612e697b3a0e9c82bef442ac17de4d5325c9bd4e487774a"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 1,
+      "score": 2.4252774484914115,
+      "prediction": 1,
+      "sha256": "aa023edc0ea90b03657c89d1ce1bff987ff794f82b1cbe614429df75f5477f9f"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 1,
+      "score": 2.4661546960339273,
+      "prediction": 1,
+      "sha256": "eb54e0be86905dd25ae8007a02c00e6f98f9464c415b327079db9728352da3ca"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 1,
+      "score": 4.136193698508086,
+      "prediction": 1,
+      "sha256": "2870916a4af82ceb4cc23ed8722d2afd39de47f76c716e856d547a82538f53e6"
+    },
+    {
+      "model": "hybrid",
+      "category": "hole_blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 1,
+      "score": 3.994956654547042,
+      "prediction": 1,
+      "sha256": "c8ff5c0c0e0616fbc773d750b0abb2117223738c717eaacf6ada31c5e6db4726"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "20-0.wav",
+      "group": 20,
+      "label": 1,
+      "score": 9.445588522409363,
+      "prediction": 1,
+      "sha256": "8f420ea360926885557f2f4925f83f1956dacd8656bac092bf6f139e90bb2594"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "20-1.wav",
+      "group": 20,
+      "label": 1,
+      "score": 1.8201423597472506,
+      "prediction": 1,
+      "sha256": "2c068f38c8124ca029695fef145c3e889db1f5f6d40ce39220f73e18ad1f8695"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "21-0.wav",
+      "group": 21,
+      "label": 1,
+      "score": 15.437771711779664,
+      "prediction": 1,
+      "sha256": "8310051fde644e71bfc0369221462a4ad883720b43c81c33b83141319321c950"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "21-1.wav",
+      "group": 21,
+      "label": 1,
+      "score": 5.147826090791022,
+      "prediction": 1,
+      "sha256": "95abedee2851b714a694c0ba9bf59b2af6bd7a0f9e9ae80cc9810e1dba54fc36"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "22-0.wav",
+      "group": 22,
+      "label": 1,
+      "score": 4.711066289213174,
+      "prediction": 1,
+      "sha256": "68bde7ec1987fe9c6aaa5037cc1d2eed32b480977125926459aedea0ad100660"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "22-1.wav",
+      "group": 22,
+      "label": 1,
+      "score": 2.8083759133401824,
+      "prediction": 1,
+      "sha256": "f976454476abde9794815de9ea29ff22abab9a9759329cbb386d2928bc88a28e"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "23-0.wav",
+      "group": 23,
+      "label": 1,
+      "score": 1.024346214120943,
+      "prediction": 1,
+      "sha256": "78b054e16d7e62f6062e672181b020e10495374ff40c98537a29da4cd8e02f6b"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "23-1.wav",
+      "group": 23,
+      "label": 1,
+      "score": 1.0877846379332623,
+      "prediction": 1,
+      "sha256": "767bfb9e90141a61b6a3da0bd67fb5a1e0f15031509fd037832baa39fb7dc4db"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "24-0.wav",
+      "group": 24,
+      "label": 1,
+      "score": 1.2913156331195597,
+      "prediction": 1,
+      "sha256": "82bdd31f024f0c9c3ecb1d032ca12fd7c08012ddd9b885a8e17865d01b116e6b"
+    },
+    {
+      "model": "hybrid",
+      "category": "valve_blower",
+      "filename": "24-1.wav",
+      "group": 24,
+      "label": 1,
+      "score": 1.2345095612545698,
+      "prediction": 1,
+      "sha256": "0a3c87f828959d9b6e62d6e4235ab873769566c284207593c9a52f63ceab9e0d"
+    }
+  ],
+  "training": {
+    "cnn_lstm": {
+      "history": [
+        {
+          "epoch": 1,
+          "train_mse": 0.9996664221568774,
+          "validation_mse": 2.3943609406871182
+        },
+        {
+          "epoch": 2,
+          "train_mse": 0.903846727648089,
+          "validation_mse": 2.0428437882854094
+        },
+        {
+          "epoch": 3,
+          "train_mse": 0.6146263180240508,
+          "validation_mse": 1.5385037106852377
+        },
+        {
+          "epoch": 4,
+          "train_mse": 0.4627539734686575,
+          "validation_mse": 1.2111263930797578
+        },
+        {
+          "epoch": 5,
+          "train_mse": 0.39354212748748,
+          "validation_mse": 0.8541853120250087
+        },
+        {
+          "epoch": 6,
+          "train_mse": 0.3640714389983044,
+          "validation_mse": 0.7186875077985948
+        },
+        {
+          "epoch": 7,
+          "train_mse": 0.33595959063499203,
+          "validation_mse": 0.6992286143764372
+        },
+        {
+          "epoch": 8,
+          "train_mse": 0.27239695774611605,
+          "validation_mse": 0.5934706806175171
+        },
+        {
+          "epoch": 9,
+          "train_mse": 0.22484526086238124,
+          "validation_mse": 0.43767144920364504
+        },
+        {
+          "epoch": 10,
+          "train_mse": 0.20974605668296095,
+          "validation_mse": 0.38167686914244003
+        },
+        {
+          "epoch": 11,
+          "train_mse": 0.2025572592853218,
+          "validation_mse": 0.3663652026845563
+        },
+        {
+          "epoch": 12,
+          "train_mse": 0.1993092783195998,
+          "validation_mse": 0.37108834405099195
+        },
+        {
+          "epoch": 13,
+          "train_mse": 0.19686182354406645,
+          "validation_mse": 0.36254926756505046
+        },
+        {
+          "epoch": 14,
+          "train_mse": 0.19549369576477235,
+          "validation_mse": 0.3561072254373181
+        },
+        {
+          "epoch": 15,
+          "train_mse": 0.194363417484427,
+          "validation_mse": 0.36417757320788596
+        },
+        {
+          "epoch": 16,
+          "train_mse": 0.19352376882427483,
+          "validation_mse": 0.3469073942592067
+        }
+      ],
+      "train_healthy_clips": 30,
+      "train_windows": 930,
+      "validation_healthy_clips": 10
+    },
+    "hybrid": {
+      "history": [
+        {
+          "epoch": 1,
+          "train_mse": 1.0012498627426805,
+          "validation_mse": 1.0275911000467115
+        },
+        {
+          "epoch": 2,
+          "train_mse": 0.9990628325170087,
+          "validation_mse": 1.0282673628099503
+        },
+        {
+          "epoch": 3,
+          "train_mse": 0.9988640419257584,
+          "validation_mse": 1.0280872145006734
+        },
+        {
+          "epoch": 4,
+          "train_mse": 0.9987660146528675,
+          "validation_mse": 1.0278768508665024
+        },
+        {
+          "epoch": 5,
+          "train_mse": 0.9987441557068979,
+          "validation_mse": 1.027793445894795
+        }
+      ],
+      "train_healthy_clips": 30,
+      "train_windows": 930,
+      "validation_healthy_clips": 10
+    }
+  },
+  "ar_selection": [
+    {
+      "lag": 1,
+      "alpha": 1.0,
+      "healthy_validation_mse": 0.13740060302776752
+    },
+    {
+      "lag": 1,
+      "alpha": 10.0,
+      "healthy_validation_mse": 0.13740504685218452
+    },
+    {
+      "lag": 1,
+      "alpha": 100.0,
+      "healthy_validation_mse": 0.13810740058167678
+    },
+    {
+      "lag": 2,
+      "alpha": 1.0,
+      "healthy_validation_mse": 0.1339317119015488
+    },
+    {
+      "lag": 2,
+      "alpha": 10.0,
+      "healthy_validation_mse": 0.13384259535877444
+    },
+    {
+      "lag": 2,
+      "alpha": 100.0,
+      "healthy_validation_mse": 0.1345933021849754
+    },
+    {
+      "lag": 3,
+      "alpha": 1.0,
+      "healthy_validation_mse": 0.13128785143356192
+    },
+    {
+      "lag": 3,
+      "alpha": 10.0,
+      "healthy_validation_mse": 0.13124516602499817
+    },
+    {
+      "lag": 3,
+      "alpha": 100.0,
+      "healthy_validation_mse": 0.13248214572463696
+    }
+  ],
+  "selected_lag": 3,
+  "selected_alpha": 10.0,
+  "threshold_protocol": "Maximum healthy-validation clip score. Ten clips cannot establish a low operational false-alarm rate.",
+  "single_channel_warning": "No BSS, spatial localization or dynamic-network causal-module estimate was performed."
+}

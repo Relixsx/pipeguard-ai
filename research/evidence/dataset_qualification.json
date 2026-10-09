@@ -1,0 +1,29 @@
+{
+  "ngpod": {
+    "status": "raw_data_not_acquired",
+    "paper": "https://arxiv.org/html/2411.06214v1",
+    "repository": "https://github.com/MrLiXv/MKTCN",
+    "inspected_commit": "6d4a00fcd5bdb4fdc885f2e2c2b5bb78786e7b20",
+    "tree_files": [
+      "README.md",
+      "MKTCN.ipynb"
+    ],
+    "missing_expected_folder": "pipeline_datasets"
+  },
+  "olga_multiphase": {
+    "status": "author_request_required_not_acquired",
+    "doi": "10.3390/digital6020045"
+  },
+  "gas_acoustic": {
+    "status": "150_unique_files_acquired_for_research_pilot",
+    "repository": "https://github.com/mengdinet/Gas-pipeline-leakage-data-set",
+    "healthy_and_two_leak_folders": true,
+    "raw_recordings_redistributed": false,
+    "session_metadata_verified": false,
+    "full_release_verified": false
+  },
+  "simulation": {
+    "status": "generated_declared_physics_surrogate",
+    "field_validation": false
+  }
+}

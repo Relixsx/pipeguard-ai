@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "entrypoint": "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT",
+  "serving_environment_has_torch": false,
+  "dynamic_port": 41078,
+  "methods_loaded": 4,
+  "actual_inference_readings": 720,
+  "root_and_template_http": 200,
+  "scope": "Compatibility with the current native Python Render service startup command; clean serving-only environment"
+}

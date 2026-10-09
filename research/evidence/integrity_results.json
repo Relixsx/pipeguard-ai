@@ -1,0 +1,10 @@
+{
+  "primary_runs": 142,
+  "unique_run_ids": 142,
+  "unique_generation_seeds": 142,
+  "all_primary_runs_split_as_whole_runs": true,
+  "tests_passed": 10,
+  "max_mass_balance_error_kg": 8.764100556390986e-13,
+  "audio_unique_hashes": 150,
+  "field_SCADA_acquired": false
+}

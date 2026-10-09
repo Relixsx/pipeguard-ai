@@ -1,0 +1,109 @@
+{
+  "commit": "f3acfde210161a396cb1835bcabd2a413ba20e78",
+  "rows": 1000,
+  "columns": [
+    "timestamp",
+    "segment_id",
+    "pressure",
+    "flow_rate",
+    "temperature",
+    "valve_status",
+    "pump_state",
+    "pump_speed",
+    "compressor_state",
+    "energy_consumption",
+    "alarm_triggered",
+    "event_type",
+    "target"
+  ],
+  "missing": 0,
+  "segments": 50,
+  "distinct_timestamps": 17,
+  "timestamp_min": "2024-01-01 00:00:00",
+  "timestamp_max": "2024-01-01 00:16:00",
+  "duplicate_segment_timestamp_rows": 408,
+  "distinct_times_per_segment_range": [
+    8,
+    16
+  ],
+  "maximum_normal_rows_per_segment": 23,
+  "event_counts": {
+    "normal": 694,
+    "degradation": 135,
+    "leak": 65,
+    "surge": 61,
+    "blockage": 45
+  },
+  "normal_windows": 665,
+  "mixed_segment_normal_windows": 665,
+  "hybrid_rows": 5694,
+  "hybrid_windows": 5665,
+  "window_train_count": 5098,
+  "window_validation_count": 567,
+  "raw_rows_shared_at_window_split": 29,
+  "cross_real_synthetic_boundary_windows": 29,
+  "threshold_top": 0.085,
+  "threshold_stats": 0.034964879509061575,
+  "threshold_z_above_mean": 16.537113065485226,
+  "event_core_means": {
+    "blockage": {
+      "pressure": 94.7471,
+      "flow_rate": 1.7167,
+      "temperature": 32.0009
+    },
+    "degradation": {
+      "pressure": 75.1074,
+      "flow_rate": 4.5269,
+      "temperature": 32.0084
+    },
+    "leak": {
+      "pressure": 60.0972,
+      "flow_rate": 2.9831,
+      "temperature": 32.1806
+    },
+    "normal": {
+      "pressure": 74.8544,
+      "flow_rate": 4.5229,
+      "temperature": 32.1119
+    },
+    "surge": {
+      "pressure": 97.4452,
+      "flow_rate": 5.539,
+      "temperature": 32.1175
+    }
+  },
+  "event_context_means": {
+    "blockage": {
+      "pump_speed": 898.3111,
+      "energy_consumption": 25.6964
+    },
+    "degradation": {
+      "pump_speed": 723.5637,
+      "energy_consumption": 33.7854
+    },
+    "leak": {
+      "pump_speed": 988.1308,
+      "energy_consumption": 26.4795
+    },
+    "normal": {
+      "pump_speed": 979.2514,
+      "energy_consumption": 25.7836
+    },
+    "surge": {
+      "pump_speed": 905.8623,
+      "energy_consumption": 24.937
+    }
+  },
+  "alarm_target_counts": {
+    "(0, 0)": 694,
+    "(1, 0)": 90,
+    "(1, 1)": 216
+  },
+  "source_sha256": {
+    "backend/data_loader.py": "3997959efa6c0588e05f859ffd02a63153a71ae494c6cce3ae293d8ef010f8b9",
+    "backend/train.py": "012548861228f2981767304a48a3f6a91edd086a97a95e530d7c6c7956b5886b",
+    "backend/predict.py": "84750c57d7efb5aa54a123842192f4dc355e7eaa60c3216aca865703015242e1",
+    "frontend/app.js": "3472a71e44ae2225207a146cd7a0ee00e93e9dfa1bce5966c1e072239b911620",
+    "data/scada_pipeline.csv": "31cde08db4c54ffc9999d653ff96451e809818739c346acc8b4d43fa81098d47"
+  }
+}
