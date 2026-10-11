@@ -1,0 +1,89 @@
+{
+  "initial_healthy_runs": 40,
+  "refinement_healthy_runs": 32,
+  "validation_healthy_runs": 12,
+  "calibration_healthy_runs": 24,
+  "test_seed_start": 105000,
+  "test_runs": 66,
+  "selected_threshold": 9.809051589447563,
+  "fit": {
+    "trials": [
+      {
+        "eps": 0.35,
+        "clusters": 6,
+        "healthy_validation_mse": 0.037414216361681886,
+        "accepted": true,
+        "noise_fraction": 0.8586956521739131
+      },
+      {
+        "eps": 0.5,
+        "clusters": 5,
+        "healthy_validation_mse": 0.037346641955274464,
+        "accepted": true,
+        "noise_fraction": 0.7152173913043478
+      },
+      {
+        "eps": 0.7,
+        "clusters": 2,
+        "healthy_validation_mse": 0.03736326048000567,
+        "accepted": true,
+        "noise_fraction": 0.4108695652173913
+      },
+      {
+        "eps": 0.9,
+        "clusters": 1,
+        "accepted": false
+      },
+      {
+        "eps": 1.2,
+        "clusters": 3,
+        "healthy_validation_mse": 0.037298102160030294,
+        "accepted": true,
+        "noise_fraction": 0.16630434782608697
+      },
+      {
+        "eps": 1.5,
+        "clusters": 1,
+        "accepted": false
+      },
+      {
+        "eps": 1.8,
+        "clusters": 1,
+        "accepted": false
+      }
+    ],
+    "clusters": 3,
+    "context": "30 prior readings: mean/std/max/min of two known command channels",
+    "paper": "D9 Equations 8-19; DBSCAN, balanced assignment, augmented forecasts and L1 inference",
+    "adaptations": "Ridge forecasting engines replace CatBoost; causal past chunks replace daily forecast context; no text embeddings",
+    "minimum_readings": 60,
+    "fitting_labels": "Healthy runs only"
+  },
+  "calibration": {
+    "events": 1,
+    "hours": 22.033333333333328,
+    "alarms_per_hour": 0.04538577912254162
+  },
+  "training_seed_ranges": [
+    [
+      101000,
+      101039
+    ],
+    [
+      102000,
+      102031
+    ],
+    [
+      103000,
+      103011
+    ],
+    [
+      104000,
+      104023
+    ]
+  ],
+  "test_scope": "Fresh seeds from the same gas simulator; exploratory method transfer",
+  "comparability": "Older four baselines retain their original weights/thresholds; refiner has expanded healthy training. No architecture-superiority claim.",
+  "threshold_fitted_before_test_generation": true,
+  "model_sha256": "d65f8b07eac223ad49c973311efc6f104250927ebe473c58327e2bf03fc73703"
+}

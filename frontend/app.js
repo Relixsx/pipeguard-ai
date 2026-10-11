@@ -3,10 +3,10 @@
 // Same-origin requests work on localhost, Render, Railway and custom domains.
 // Predictions always come from the backend. This file never synthesizes scores.
 const $ = id => document.getElementById(id);
-const names = ["mass_inventory", "dynamic_residual", "cnn_lstm", "hybrid"];
-const labels = { mass_inventory: "Mass balance", dynamic_residual: "Dynamic predictor", cnn_lstm: "CNN–LSTM", hybrid: "Residual hybrid" };
-const colors = { mass_inventory: "#368b7e", dynamic_residual: "#6280bc", cnn_lstm: "#b18b40", hybrid: "#986c95" };
-const descriptions = { mass_inventory: "Inlet − outlet flow, corrected for gas storage.", dynamic_residual: "Forecast errors from lagged sensors and commands.", cnn_lstm: "Reconstruction error across the eight inputs.", hybrid: "Neural innovations and the dynamic check." };
+const names = ["mass_inventory", "dynamic_residual", "cnn_lstm", "hybrid", "context_refinement"];
+const labels = { mass_inventory: "Mass balance", dynamic_residual: "Dynamic predictor", cnn_lstm: "CNN–LSTM", hybrid: "Residual hybrid", context_refinement: "Context refiner" };
+const colors = { mass_inventory: "#368b7e", dynamic_residual: "#6280bc", cnn_lstm: "#b18b40", hybrid: "#986c95", context_refinement: "#ba6e48" };
+const descriptions = { mass_inventory: "Inlet − outlet flow, corrected for gas storage.", dynamic_residual: "Forecast errors from lagged sensors and commands.", cnn_lstm: "Reconstruction error across the eight inputs.", hybrid: "Neural innovations and the dynamic check.", context_refinement: "D9 context routing and augmented forecast refinement." };
 let config, evidence, run = null, cursor = 719, timer = null, busy = false;
 let coverage = "broad";
 
@@ -36,7 +36,7 @@ function setBusy(value) {
   busy = value;
   $("run-button").disabled = value;
   $("csv-upload").disabled = value;
-  $("run-button").firstElementChild.textContent = value ? "Computing all four methods…" : "Run experiment";
+  $("run-button").firstElementChild.textContent = value ? "Computing all five methods…" : "Run experiment";
   $("scenario-form").setAttribute("aria-busy", String(value));
 }
 
@@ -100,7 +100,7 @@ function renderRun() {
     status.className = `model-status ${quality === "data_quality_alert" ? "quality" : score == null ? "warm" : model.active[cursor] ? "alert" : pending ? "quality" : ""}`;
     status.lastElementChild.textContent = state;
     $(`value-${name}`).innerHTML = `${valueText(score == null ? null : score / model.threshold, 2)}<small>× threshold</small>`;
-    $(`score-${name}`).textContent = score == null ? `${run.predictions.warmup_readings} consecutive valid readings required` : `Score ${score.toPrecision(4)} / threshold ${model.threshold.toPrecision(4)}`;
+    $(`score-${name}`).textContent = score == null ? `${model.warmup_readings} consecutive valid readings required` : `Score ${score.toPrecision(4)} / threshold ${model.threshold.toPrecision(4)}`;
     const events = model.event_times_s.filter(t => t <= run.time_s[cursor]);
     const after = run.ground_truth?.onset_s == null ? [] : events.filter(t => t >= run.ground_truth.onset_s);
     let summary = `${events.length} new alarm event${events.length === 1 ? "" : "s"} so far`;
@@ -209,7 +209,7 @@ function parseCSV(text) {
 
 $("scenario-form").addEventListener("submit", async event => {
   event.preventDefault(); if (busy || !config || !$("scenario-form").reportValidity()) return;
-  stopReplay(); setBusy(true); message("Running the simulator and all four frozen models. No ground-truth labels enter inference.");
+  stopReplay(); setBusy(true); message("Running the simulator and all five frozen models. No ground-truth labels enter inference.");
   const payload = {scenario:$("scenario").value,leak_fraction:Number($("leak-fraction").value),location:Number($("location").value),regime:$("regime").value,seed:Number($("seed").value)};
   try { const data = await request("/api/runs", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}); applyRun(data); message(`Experiment complete. ${data.time_s.length} readings scored in ${data.compute_seconds.toFixed(3)} s. Replay the trace or export the complete record.`); }
   catch (error) { message(error.message,true); }
@@ -235,8 +235,8 @@ document.querySelectorAll("[data-tab]").forEach(button => {
   button.addEventListener("click",()=>selectTab(button.dataset.tab));
   button.addEventListener("keydown",event => {
     if (!["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) return;
-    event.preventDefault(); const tabs=["lab","results","research"],i=tabs.indexOf(button.dataset.tab);
-    const next=event.key === "Home" ? 0 : event.key === "End" ? 2 : (i+(event.key === "ArrowRight" ? 1 : 2))%3;
+    event.preventDefault(); const tabs=["lab","methods","results","research"],i=tabs.indexOf(button.dataset.tab);
+    const next=event.key === "Home" ? 0 : event.key === "End" ? tabs.length-1 : (i+(event.key === "ArrowRight" ? 1 : tabs.length-1))%tabs.length;
     selectTab(tabs[next],true);
   });
 });

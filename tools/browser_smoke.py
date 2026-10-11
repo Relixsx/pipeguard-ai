@@ -16,6 +16,7 @@ from pathlib import Path
 from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 
 def main():
@@ -58,12 +59,12 @@ def main():
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.on("console", lambda message: errors.append(message.text) if message.type == "error" else None)
             page.goto(args.url, wait_until="networkidle")
-            expect(page.locator("#server-status")).to_have_text("4 methods ready")
+            expect(page.locator("#server-status")).to_have_text("5 methods ready")
             expect(page.locator("#run-kind")).to_have_text("SIMULATED READINGS")
             expect(page.locator("#pressure-chart svg")).to_be_visible()
             assert page.locator("#score-chart svg path").count() >= 7
             assert page.locator("#summary-cnn_lstm").inner_text() == "No new post-onset alarm so far"
-            checks.append("Packaged example displays actual four-model inference")
+            checks.append("Packaged example displays actual five-model inference")
             page.screenshot(path=output / "desktop-lab.png", full_page=True)
             scores = page.locator(".score-value").all_inner_texts()
             page.locator("#show-truth").uncheck()
@@ -86,6 +87,41 @@ def main():
             page.locator("#tab-research").click()
             expect(page.locator("#references li")).to_have_count(10)
             checks.append("Ten paper references and qualified dataset plan display")
+            page.locator("#tab-methods").click()
+            expect(page.locator("#network-output .method-chart svg")).to_be_visible()
+            expect(page.locator("#recorded-transfer")).to_contain_text("684")
+            page.locator("#network-scenario").select_option("weak_excitation")
+            with page.expect_response(lambda r: r.url.endswith('/api/labs/network')) as network:
+                page.locator("#network-form button").click()
+            assert network.value.status == 201
+            expect(page.locator("#network-output .guard-status")).to_contain_text("Attribution withheld")
+            with page.expect_download() as lab_download:
+                page.locator("#network-output a").click()
+            lab_download.value.save_as(output / 'network.json')
+            assert not any(r['supported'] for r in json.loads((output / 'network.json').read_text())['rolling'])
+            page.locator("#information-excitation").select_option("wrong_location")
+            with page.expect_response(lambda r: r.url.endswith('/api/labs/information')) as information:
+                page.locator("#information-form button").click()
+            assert information.value.status == 201
+            expect(page.locator("#information-output .guard-status")).to_contain_text("fails")
+            page.locator("#acoustic-scenario").select_option("correlated")
+            with page.expect_response(lambda r: r.url.endswith('/api/labs/acoustic')) as acoustic:
+                page.locator("#acoustic-form button").click()
+            assert acoustic.value.status == 201
+            expect(page.locator("#acoustic-output .guard-status")).to_contain_text("unsupported")
+            from backend.paper_labs import acoustic_data
+            acoustic_rows = acoustic_data(96001, samples=1536)['measurements']
+            acoustic_csv = 'm1,m2,m3,m4,m5\n'+'\n'.join(','.join(map(str, row)) for row in acoustic_rows)
+            page.locator('.method-upload summary').click()
+            with page.expect_response(lambda r: r.url.endswith('/api/labs/acoustic/analyze')) as uploaded_acoustic:
+                page.locator('#acoustic-upload').set_input_files({'name': 'channels.csv', 'mimeType': 'text/csv', 'buffer': acoustic_csv.encode()})
+            assert uploaded_acoustic.value.status == 201
+            assert uploaded_acoustic.value.json()['lab'] == 'acoustic_upload'
+            assert uploaded_acoustic.value.json()['rms_sample_indices'][0] >= 1024
+            expect(page.locator('#acoustic-output .rms-heatmap svg')).to_have_count(2)
+            checks.append('Synchronized acoustic CSV upload fits, verifies and monitors disjoint segments through the actual API')
+            page.screenshot(path=output / "desktop-methods.png", full_page=True)
+            checks.append("Actual paper APIs, weak-excitation guard, excitation-location failure, correlated-source screen and JSON export work")
             page.locator("#tab-lab").click()
             page.locator("#scenario").select_option("missing_sensor")
             with page.expect_response(lambda response: response.url.endswith("/api/runs") and response.request.method == "POST") as result:
@@ -114,11 +150,14 @@ def main():
             # Small screens use the same real app, with no separate mock.
             page.set_viewport_size({"width":390,"height":844})
             page.reload(wait_until="networkidle")
-            expect(page.locator("#server-status")).to_have_text("4 methods ready")
+            expect(page.locator("#server-status")).to_have_text("5 methods ready")
             page.evaluate("document.activeElement.blur(); window.scrollTo(0,0)")
             page.screenshot(path=output / "mobile-lab.png", full_page=True)
             overflow = page.evaluate("Array.from(document.querySelectorAll('body *')).filter(el=>el.getBoundingClientRect().right>window.innerWidth+1).map(el=>({tag:el.tagName,id:el.id,class:el.className,right:el.getBoundingClientRect().right})).slice(0,15)")
             assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), f"Mobile horizontal overflow: {overflow}"
+            page.locator("#tab-methods").click()
+            page.screenshot(path=output / "mobile-methods.png", full_page=True)
+            assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), "Paper-method panel overflows mobile screen"
             checks.append("390 px responsive layout has no horizontal overflow")
             assert not errors, errors
             browser.close()

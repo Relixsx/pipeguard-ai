@@ -21,6 +21,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--python", required=True)
     parser.add_argument("--output")
+    parser.add_argument("--render-entrypoint", action="store_true")
     args = parser.parse_args()
     python = Path(args.python).absolute()
     with tempfile.TemporaryDirectory(prefix="pipeguard-startup-") as folder:
@@ -40,14 +41,16 @@ def main():
             raise RuntimeError("Provide a serving-only Python environment without Torch")
         options = {"user":65534,"group":65534} if os.getuid() == 0 else {}
         with (stage / "startup.log").open("w") as log:
+            command = [str(python), '-m', 'uvicorn', 'main:app', '--host', '0.0.0.0', '--port', env['PORT']] if args.render_entrypoint else ['sh', 'start.sh']
+            working = stage / 'backend' if args.render_entrypoint else stage
             try:
-                process = subprocess.Popen(["sh","start.sh"],cwd=stage,env=env,stdout=log,stderr=subprocess.STDOUT,**options)
+                process = subprocess.Popen(command,cwd=working,env=env,stdout=log,stderr=subprocess.STDOUT,**options)
             except OSError as error:
                 if not options or error.errno not in (errno.EINVAL, errno.EPERM):
                     raise
                 # Some managed runtimes map only UID 0. Report that limitation.
                 options = {}
-                process = subprocess.Popen(["sh","start.sh"],cwd=stage,env=env,stdout=log,stderr=subprocess.STDOUT)
+                process = subprocess.Popen(command,cwd=working,env=env,stdout=log,stderr=subprocess.STDOUT)
             try:
                 for attempt in range(80):
                     try:
@@ -60,8 +63,8 @@ def main():
                         time.sleep(.1)
                 else:
                     raise RuntimeError("Entrypoint did not become ready")
-                assert health["models_loaded"] == 4
-                for path in ("/", "/assets/app.js", "/api/example", "/api/evidence", "/api/download/report"):
+                assert health["models_loaded"] == 5
+                for path in ("/", "/assets/app.js", "/assets/paper-labs.js", "/api/example", "/api/evidence", "/api/paper-methods", "/api/download/method-audit", "/api/download/report"):
                     assert urllib.request.urlopen("http://127.0.0.1:41077"+path,timeout=5).status == 200
                 request = urllib.request.Request("http://127.0.0.1:41077/api/runs",data=json.dumps({"scenario":"sensor_bias","seed":84010}).encode(),headers={"Content-Type":"application/json"})
                 with urllib.request.urlopen(request,timeout=20) as response:
@@ -70,7 +73,8 @@ def main():
                 assert run["ground_truth"]["onset_s"] is None
                 result = {"status":"passed","serving_environment_has_torch":False,
                           "non_root_verified":bool(options) or os.getuid()!=0,"dynamic_port":41077,
-                          "methods_loaded":4,"actual_inference_readings":720,
+                          "methods_loaded":5,"actual_inference_readings":720,
+                          "entrypoint": 'cd backend; uvicorn main:app' if args.render_entrypoint else 'sh start.sh',
                           "scope":"Docker file-set/entrypoint check; no Docker image build performed"}
                 if args.output: Path(args.output).write_text(json.dumps(result,indent=2)+"\n")
                 print(json.dumps(result,indent=2))

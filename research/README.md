@@ -3,7 +3,11 @@
 This package contains **executed experiments**, trained checkpoints, a local API,
 and an auditable data-access record. It extends the ideas in
 [Relixsx/pipeguard-ai](https://github.com/Relixsx/pipeguard-ai), audited at commit
-`f3acfde210161a396cb1835bcabd2a413ba20e78`. It has not been pushed to that repository.
+`f3acfde210161a396cb1835bcabd2a413ba20e78`. It is integrated into that repository and the same-origin web application.
+
+## Version 3 paper-method execution
+
+Read [PAPER_METHODS_AUDIT.md](PAPER_METHODS_AUDIT.md) for the current executable paper methods, acquired GPLA waveforms, fresh gas context-refinement benchmark and matched-data ablation. Run its commands from the repository root. The experiments below describe the original baseline study; they remain archived separately.
 
 ## What was executed
 

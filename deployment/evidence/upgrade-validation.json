@@ -1,0 +1,60 @@
+{
+  "version": "3.0.0",
+  "executed_date": "2026-10-11",
+  "algorithm_and_api_tests_passed": 31,
+  "causal_prefix_and_gap_checks": true,
+  "original_alarm_parity": {
+    "runs": 66,
+    "model_run_comparisons": 264,
+    "alarm_timestamps_match": true,
+    "seconds": 18.449,
+    "scope": "Replay parity, not new validation data"
+  },
+  "context_alarm_parity": {
+    "runs": 132,
+    "context_alarm_timestamps_match": true,
+    "scope": "Frozen serving integration parity; not new validation data",
+    "seconds": 37.754
+  },
+  "browser": {
+    "checks": [
+      "Packaged example displays actual five-model inference",
+      "Truth toggle cannot alter model scores; replay controls work",
+      "Both calibration comparisons and saved acoustic results display",
+      "Ten paper references and qualified dataset plan display",
+      "Synchronized acoustic CSV upload fits, verifies and monitors disjoint segments through the actual API",
+      "Actual paper APIs, weak-excitation guard, excitation-location failure, correlated-source screen and JSON export work",
+      "New inference request, dropout suspension and warm-up display",
+      "CSV download contains all readings; SI-schema import uses actual API",
+      "390 px responsive layout has no horizontal overflow"
+    ],
+    "browser_errors": [],
+    "status": "passed",
+    "url": "http://127.0.0.1:8000"
+  },
+  "startup": {
+    "status": "passed",
+    "serving_environment_has_torch": false,
+    "non_root_verified": false,
+    "dynamic_port": 41077,
+    "methods_loaded": 5,
+    "actual_inference_readings": 720,
+    "scope": "Docker file-set/entrypoint check; no Docker image build performed"
+  },
+  "known_scientific_limits": [
+    "No field validation",
+    "Clustering superiority not established in matched-data ablation",
+    "Nominal HAC/surrogate levels not guaranteed finite-sample coverage",
+    "Recorded-waveform evaluation uses imposed mixing and unverified acquisition independence"
+  ],
+  "render_entrypoint": {
+    "status": "passed",
+    "serving_environment_has_torch": false,
+    "non_root_verified": false,
+    "dynamic_port": 41077,
+    "methods_loaded": 5,
+    "actual_inference_readings": 720,
+    "entrypoint": "cd backend; uvicorn main:app",
+    "scope": "Docker file-set/entrypoint check; no Docker image build performed"
+  }
+}

@@ -1,6 +1,6 @@
 # PipeGuard Research Lab
 
-A deployable pipeline-monitoring research prototype. The UI and API run together, without a visitor login, and compare **four frozen methods on the same sensor stream**. This update integrates the executed research into the original PipeGuard application.
+A deployable pipeline-monitoring research prototype. The UI and API run together, without a visitor login, and compare **five frozen methods on the same sensor stream**, alongside executable paper-method laboratories. This update integrates the executed research into the original PipeGuard application.
 
 The models were trained on a three-volume, isothermal, quasi-steady gas simulator. This is a scholarship/interview demonstration and a reproducible research starting point. Field performance, leak cause and leak localization are unestablished.
 
@@ -35,9 +35,21 @@ For Render or another host, see [DEPLOYMENT.md](DEPLOYMENT.md). The same applica
 - Download all readings, scores and alert states, including healthy periods. Review the full report, ten-paper mapping, original-source audit and saved benchmark results in the UI.
 - Bounded compute and ephemeral run storage. No external chart libraries or hard-coded backend URLs in the dashboard.
 
-## Frozen models and results
+## Paper algorithms implemented in version 3
 
-The deployed neural seed is 11. The full research includes seeds 11, 23 and 37; broader calibration was executed only for seed 11. All four methods receive the same eight input channels, but monitor different objectives: the raw autoencoder reconstructs eight channels, the predictor forecasts six physical channels, and the hybrid checks six innovations.
+Open **Paper methods** in the live dashboard. The server computes graph-preserving input selection and immersion (D2), external-reference two-stage identification (D2), target identifiability/excitation placement (D4/D6), and delayed spatial FIR acoustic source estimation (D8). Upload synchronized acoustic channels for healthy-reference fitting and verification. The main gas lab adds a D9 framework adaptation: DBSCAN context centers, balanced chunk assignment, augmented forecast refiners and causal L1 routing.
+
+This is selective, explicit implementation: D5's general blocking-node algorithm, D7's full sparse echo optimizer and D10's VMD framework are not reproduced. [The full audit](research/PAPER_METHODS_AUDIT.md) maps all ten papers and explains the assumptions and negative results.
+
+- With colored shared disturbances, 80 independent controlled-network runs give two-stage target RMSE **0.0143**, versus ordinary regression **0.3166**. All 80 weak-excitation runs withhold attribution.
+- Actual GPLA v1 data were acquired: **684 unique gas-leak waveform rows**. Controlled five-channel mixing with recorded interference gives median reference correlation **0.360 → 0.981** and **22.4 dB** SI-SDR gain. This is not field multichannel validation; GPLA has no healthy class.
+- A matched-data fresh gas cohort gives context refinement **27/36** detections and global refinement **26/36**, each with **4 false events / 26.6625 h**. Clustering superiority is not established. The fifth detector remains experimental.
+
+Reproduction commands, calibrated thresholds, seed ranges and all per-run/per-waveform results are linked from the audit. The original four-model benchmark below remains archived. Context refinement needs 60 consecutive valid readings; the original four need 32.
+
+## Original frozen models and results
+
+The deployed neural seed is 11. The full research includes seeds 11, 23 and 37; broader calibration was executed only for seed 11. The original four methods receive the same eight input channels, but monitor different objectives: the raw autoencoder reconstructs eight channels, the predictor forecasts six physical channels, and the hybrid checks six innovations.
 
 Exploratory broader-calibration evaluation on **66 fresh simulated runs**, including **36 injected leak events**, with **28.5806 scored healthy test hours**:
 
@@ -63,13 +75,13 @@ A separate small real gas-acoustic pilot used 150 unique one-second clips, inclu
 | `backend/experiments.py` | Scenarios, bounded storage, exports and post-inference truth comparisons |
 | `backend/simulator.py`, `backend/physics.py` | Audited simulator and inventory calculation |
 | `frontend/` | Dashboard, local SVG plots, replay and CSV import |
-| `deployment/models/` | Two ONNX models, dynamic reference, frozen config and SHA-256 manifest |
+| `deployment/models/` | Two ONNX models, dynamic/context references, frozen config and SHA-256 manifest |
 | `deployment/evidence/` | Executed results, report, immutable example and replay parity evidence |
 | `research/` | Reproducible training/calibration scripts, original PyTorch checkpoints and reading record |
 | `legacy/` | Preserved original application, data and weights; excluded from deployment |
 | `tests/`, `tools/` | Integration checks, export verification and benchmark replay |
 
-The legacy label-driven score demo, account gate, global stream buffer and anomaly-only persistence are not the serving path in version 2.
+The legacy label-driven score demo, account gate, global stream buffer and anomaly-only persistence are not the serving path in version 3.
 
 ## Verification and reproduction
 
@@ -77,6 +89,7 @@ The legacy label-driven score demo, account gate, global stream buffer and anoma
 pip install -r requirements-dev.txt
 python -m unittest discover -s tests -p 'test_*.py' -v
 python tools/verify_benchmark.py
+python tools/verify_context_runtime.py
 ```
 
 `verify_benchmark.py` regenerates all 66 final scenarios and verifies the deployed methods against **all 264 archived model/run alarm traces**. It is a parity check, not new validation data. Tests also check causal prefixes, missing/gapped readings, isolation, real API scores, complete exports and request bounds.

@@ -18,7 +18,8 @@
     "dynamic_residual": 23.906078048705982,
     "cnn_lstm": 18.70625104141237,
     "hybrid": 10.920479654312116,
-    "mass_inventory": 0.02008840326880925
+    "mass_inventory": 0.02008840326880925,
+    "context_refinement": 9.809051589447563
   },
   "hybrid_neural_scale": 2.1352012157440186,
   "hybrid_dynamic_scale": 2.247454881668091,
@@ -26,5 +27,14 @@
   "clearance": 5,
   "cooldown_s": 120,
   "calibration": "broad healthy coverage, independent simulation seeds",
-  "scope": "Simulation-trained research demonstration. No field validation or inferred leak location."
+  "scope": "Simulation-trained research demonstration. No field validation or inferred leak location.",
+  "version": "3.0.0",
+  "context_calibration": "D9 adaptation, independently trained and calibrated healthy seed ranges 101000-104023",
+  "warmup_by_method": {
+    "dynamic_residual": 32,
+    "cnn_lstm": 32,
+    "hybrid": 32,
+    "mass_inventory": 32,
+    "context_refinement": 60
+  }
 }

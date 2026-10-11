@@ -25,5 +25,16 @@
   "simulation": {
     "status": "generated_declared_physics_surrogate",
     "field_validation": false
+  },
+  "gpla_12": {
+    "status": "684_unique_v1_waveform_rows_acquired_and_used_in_controlled_mixing",
+    "repository": "https://github.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12",
+    "commit": "afec271f4eb445a976826c6a45485892e5fbab53",
+    "healthy_class": false,
+    "verified_synchronized_pairing": false,
+    "verified_independent_sessions": false,
+    "field_validation": false,
+    "v3_placeholder": true,
+    "evidence": "recorded_source_transfer.json"
   }
 }
