@@ -52,7 +52,8 @@ Then use the UI to:
 - Run the default 5% abrupt leak scenario, seed 82001. It should reproduce the packaged example, including CNN–LSTM misses.
 - Choose missing pressure sensor; during the dropout every method should suspend scoring, then warm up again.
 - Export CSV and verify it includes all 720 observations, not only anomalies.
-- Open Results, compare both calibration settings, and download the research report.
+- Open Paper methods; exercise two-stage identification, excitation placement, acoustic filtering and its synchronized CSV upload. Review the matched-data context ablation and download the method audit.
+- Open Results for the archived four-model calibration comparison and original report.
 - Use a phone-sized viewport and confirm the controls and plots fit.
 
 For scripted browser validation:
@@ -67,7 +68,7 @@ Do not declare deployment complete on the basis of a successful build alone. Che
 
 Use one Uvicorn worker. Models are shared immutable sessions; windows and alert history belong to each run. Runs are ephemeral, capped at 12 and expire after one hour; server restarts discard them. Do not add workers or replicas and expect those run URLs to share state. A durable, authenticated deployment needs a separate state store and upload policy.
 
-Default compute bounds: one simultaneous experiment; 20 new computations per client per ten minutes; 512 kB request bodies; 32–1,200 uploaded readings. Busy requests return 503 and a retry interval. Oversized/invalid requests are rejected rather than silently changing model semantics.
+Default compute bounds: one simultaneous experiment; 20 new computations per client per ten minutes; 512 kB request bodies; 32–1,200 gas readings, or 768–4,096 synchronized acoustic rows. Busy requests return 503 and a retry interval. Oversized/invalid requests are rejected rather than silently changing model semantics.
 
 ## Publish status
 
@@ -75,11 +76,11 @@ A local commit or ZIP is not a GitHub push, and neither is a live deployment. Pu
 
 ## Checks completed on this update
 
-- Eleven application tests passed.
-- Every alarm timestamp in all 264 archived model/run comparisons matched the deployed runtime.
+- 31 algorithm and application/API tests passed.
+- Every alarm timestamp in all 264 original comparisons and 132 context-model comparisons matched the frozen serving runtime.
 - Desktop and 390 px mobile browser checks passed with zero JavaScript/console errors.
 - The exact serving file set and `start.sh` worked with a clean serving-only environment and a non-default `PORT`; a real 720-reading inference request completed.
 - The existing Render Python service's `cd backend && uvicorn main:app` entrypoint also passed readiness, dashboard, CSV template and real 720-reading inference checks in a clean serving-only environment.
 - Docker was unavailable in the execution environment, so an image build was not performed. The environment could not map another UID; running the image's non-root user is not independently verified here. The Dockerfile specifies that user explicitly.
 
-See `deployment/evidence/validation.json` and the individual reports for the exact scope. Run a separate live-URL smoke test for each deployed commit; local validation alone is not a deployment check.
+See `deployment/evidence/upgrade-validation.json` for version 3 and `deployment/evidence/validation.json` for the archived original checks and the individual reports for the exact scope. Run a separate live-URL smoke test for each deployed commit; local validation alone is not a deployment check.

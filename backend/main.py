@@ -1,5 +1,6 @@
 """Same-origin public research demo. No credentials or training at startup."""
 import json
+import os
 import sys
 import threading
 import time
@@ -14,6 +15,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 ROOT = Path(__file__).resolve().parents[1]
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
 # Existing Render services may still launch `cd backend && uvicorn main:app`.
 # Resolve our package from the repository root in that entrypoint as well.
 if not __package__:
@@ -21,6 +24,7 @@ if not __package__:
 from backend.experiments import SCENARIOS, RunStore, create_analysis, create_simulation, run_csv
 from backend.runtime import Runtime
 from backend.simulator import FEATURES
+from backend.paper_labs import network_lab, information_lab, acoustic_lab, analyze_acoustic
 
 MAX_BODY_BYTES = 512_000
 
@@ -61,6 +65,43 @@ class AnalysisRequest(BaseModel):
     readings: list[Reading] = Field(min_length=32, max_length=1200)
 
 
+class NetworkRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    seed: int = Field(default=91001, ge=0, le=2_147_483_640)
+    scenario: Literal["confounded", "independent_noise", "weak_excitation", "target_change", "control_change"] = "confounded"
+    sensor_mode: Literal["selected", "target_only"] = "selected"
+
+
+class InformationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    excitation: Literal["target_and_separator", "wrong_location"] = "target_and_separator"
+
+
+class AcousticRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    seed: int = Field(default=92001, ge=0, le=2_147_483_640)
+    scenario: Literal["independent", "source_change", "correlated", "colored", "dependent_uncorrelated"] = "source_change"
+
+
+class AcousticUpload(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    measurements: list[list[float]] = Field(min_length=768, max_length=4096)
+    healthy_samples: int = Field(default=1024, ge=512, le=3840)
+    order: int = Field(default=4, ge=1, le=12)
+    radius: int = Field(default=1, ge=1, le=2)
+    adjacent_delay: int = Field(default=3, ge=1, le=8)
+
+    @field_validator("measurements")
+    @classmethod
+    def synchronized(cls, rows):
+        channels = len(rows[0])
+        if not 2 <= channels <= 8 or any(len(row) != channels for row in rows):
+            raise ValueError("Every row must contain the same 2-8 synchronized finite channels")
+        if any(abs(v) > 1e12 for row in rows for v in row):
+            raise ValueError("Channel magnitude exceeds the numeric range")
+        return rows
+
+
 class RateLimit:
     """Bounded per-client compute allowance, not a persistent identity system."""
     def __init__(self):
@@ -95,7 +136,7 @@ def create_app():
         app.state.limiter = RateLimit()
         yield
 
-    app = FastAPI(title="PipeGuard Research Lab", version="2.0.0", lifespan=lifespan, docs_url=None, redoc_url=None)
+    app = FastAPI(title="PipeGuard Research Lab", version="3.0.0", lifespan=lifespan, docs_url=None, redoc_url=None)
 
     @app.middleware("http")
     async def request_bounds(request, call_next):
@@ -145,7 +186,7 @@ def create_app():
         ready = hasattr(request.app.state, "runtime")
         if not ready:
             raise HTTPException(503, "Models are not ready")
-        return {"status": "ready", "version": "2.0.0", "models_loaded": 4,
+        return {"status": "ready", "version": "3.0.0", "models_loaded": 5,
                 "neural_runtime": "ONNX CPU", "scope": "simulation research demo"}
 
     @app.get("/api/config")
@@ -178,6 +219,32 @@ def create_app():
     def analyze(payload: AnalysisRequest, request: Request):
         return compute(request, create_analysis, payload)
 
+    @app.post("/api/labs/network", status_code=201)
+    def network(payload: NetworkRequest, request: Request):
+        return compute(request, lambda _, p: network_lab(**p.model_dump()), payload)
+
+    @app.post("/api/labs/information", status_code=201)
+    def information(payload: InformationRequest, request: Request):
+        return compute(request, lambda _, p: information_lab(**p.model_dump()), payload)
+
+    @app.post("/api/labs/acoustic", status_code=201)
+    def acoustic(payload: AcousticRequest, request: Request):
+        return compute(request, lambda _, p: acoustic_lab(**p.model_dump()), payload)
+
+    @app.post("/api/labs/acoustic/analyze", status_code=201)
+    def acoustic_upload(payload: AcousticUpload, request: Request):
+        if len(payload.measurements)-payload.healthy_samples < 256:
+            raise HTTPException(422, "Reserve at least 256 subsequent samples for monitoring")
+        return compute(request, lambda _, p: analyze_acoustic(**p.model_dump()), payload)
+
+    @app.get("/api/paper-methods")
+    def paper_methods():
+        root = ROOT / "deployment/evidence"
+        return {key: json.loads((root / filename).read_text()) for key, filename in {
+            "examples": "paper_methods_examples.json", "benchmarks": "paper_methods_results.json",
+            "context": "context_refinement_results.json", "ablation": "context_ablation_results.json",
+            "recorded_transfer": "recorded_source_transfer.json"}.items()}
+
     def get_run(request, run_id):
         if run_id == "example":
             return json.loads((ROOT / "deployment/evidence/example.json").read_text())
@@ -196,7 +263,10 @@ def create_app():
 
     @app.get("/api/runs/{run_id}/export.csv")
     def csv_export(run_id: str, request: Request):
-        content = run_csv(get_run(request, run_id))
+        run = get_run(request, run_id)
+        if "predictions" not in run:
+            raise HTTPException(422, "Paper-method labs export their full results as JSON")
+        content = run_csv(run)
         return Response(content, media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="pipeguard-{run_id}.csv"'})
 
     @app.get("/api/runs/{run_id}/export.json")
@@ -217,6 +287,7 @@ def create_app():
             "datasets": json.loads((root / "dataset_qualification.json").read_text()),
             "manifest": json.loads((ROOT / "deployment/models/manifest.json").read_text()),
             "runtime_validation": json.loads((root / "validation.json").read_text()),
+            "upgrade_validation": json.loads((root / "upgrade-validation.json").read_text()),
         }
 
     files = {
@@ -225,6 +296,10 @@ def create_app():
         "paper-mapping": "PAPER_MAPPING.md", "data-access": "DATA_ACCESS.md",
         "reading-ledger": "paper_reading_ledger.json", "source-audit": "source_audit.json",
         "validation": "validation.json",
+        "method-audit": "PAPER_METHODS_AUDIT.md", "method-results": "paper_methods_results.json",
+        "context-results": "context_refinement_results.json", "context-ablation": "context_ablation_results.json",
+        "recorded-transfer": "recorded_source_transfer.json",
+        "upgrade-validation": "upgrade-validation.json",
     }
 
     @app.get("/api/download/{name}")

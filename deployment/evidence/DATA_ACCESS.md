@@ -76,3 +76,9 @@ Until this contract is met, the delivered SCADA comparisons remain simulations.
 The public acoustic recordings are relevant to the gas-leak task but represent
 a separate sensing modality. They should not replace pressure/flow telemetry
 without changing the project's sensing design.
+
+## GPLA-12 acquisition and controlled mixing, version 3
+
+[GPLA source](https://github.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12) was pinned at afec271f4eb445a976826c6a45485892e5fbab53 on 2026-10-11. The advertised v3 folder contains a one-byte placeholder; actual v1 CSV data and the repository EPL-2.0 license were downloaded and hashed. There are 684 unique waveform rows of 1,460 values, with 12 pressure/noise/microphone conditions, 57 rows each. These are gas-leak recordings, with no healthy class. Acquisition sessions and synchronized channel pairing are not verified.
+
+All 684 rows are used only as previously unseen recorded sources in controlled five-channel mixing experiments with Meng blower interference. This supports waveform-transfer evaluation, not leak-event accuracy or field localization. See PAPER_METHODS_AUDIT.md and recorded_source_transfer.json for all metrics, hashes and limitations. Raw recordings are not bundled. Reproduce acquisition with research/download_gpla.py.

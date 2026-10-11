@@ -1,0 +1,348 @@
+{
+  "network": [
+    {
+      "scenario": "independent_noise",
+      "replications": 80,
+      "true_target_gain": 0.65,
+      "two_stage_mean": 0.6498401633025189,
+      "two_stage_bias": -0.0001598366974810972,
+      "two_stage_rmse": 0.004177965130217688,
+      "naive_ols_mean": 0.6498473225646461,
+      "naive_ols_bias": -0.00015267743535396505,
+      "naive_ols_rmse": 0.003988911008998175,
+      "hac_interval_coverage": 0.925,
+      "attribution_supported_runs": 80
+    },
+    {
+      "scenario": "confounded",
+      "replications": 80,
+      "true_target_gain": 0.65,
+      "two_stage_mean": 0.651340903300593,
+      "two_stage_bias": 0.0013409033005929993,
+      "two_stage_rmse": 0.014306720972239078,
+      "naive_ols_mean": 0.9664449877724792,
+      "naive_ols_bias": 0.3164449877724792,
+      "naive_ols_rmse": 0.31664236786584266,
+      "hac_interval_coverage": 0.95,
+      "attribution_supported_runs": 80
+    },
+    {
+      "scenario": "weak_excitation",
+      "replications": 80,
+      "true_target_gain": 0.65,
+      "two_stage_mean": 1.2251399788241233,
+      "two_stage_bias": 0.5751399788241233,
+      "two_stage_rmse": 0.5999853849610478,
+      "naive_ols_mean": 1.3038695102054216,
+      "naive_ols_bias": 0.6538695102054216,
+      "naive_ols_rmse": 0.6540468916813966,
+      "hac_interval_coverage": 0.1125,
+      "attribution_supported_runs": 0
+    }
+  ],
+  "acoustic": [
+    {
+      "scenario": "independent",
+      "replications": 12,
+      "dependence_screen_rejections": 2,
+      "mean_raw_cross_correlation": 0.35685682027797605,
+      "mean_residual_cross_correlation": 0.05520872036752065,
+      "mean_known_source_correlation": 0.9987084231193525,
+      "interpretation": "Uncorrelated-but-dependent and colored-source cases expose limits of a correlation certificate"
+    },
+    {
+      "scenario": "correlated",
+      "replications": 12,
+      "dependence_screen_rejections": 12,
+      "mean_raw_cross_correlation": 0.8897753926344406,
+      "mean_residual_cross_correlation": 0.9479746629066811,
+      "mean_known_source_correlation": 0.9986749274279553,
+      "interpretation": "Uncorrelated-but-dependent and colored-source cases expose limits of a correlation certificate"
+    },
+    {
+      "scenario": "colored",
+      "replications": 12,
+      "dependence_screen_rejections": 2,
+      "mean_raw_cross_correlation": 0.45562793994408124,
+      "mean_residual_cross_correlation": 0.05423985675281145,
+      "mean_known_source_correlation": 0.7234860581080423,
+      "interpretation": "Uncorrelated-but-dependent and colored-source cases expose limits of a correlation certificate"
+    },
+    {
+      "scenario": "dependent_uncorrelated",
+      "replications": 12,
+      "dependence_screen_rejections": 2,
+      "mean_raw_cross_correlation": 0.353259774550102,
+      "mean_residual_cross_correlation": 0.05351202390757262,
+      "mean_known_source_correlation": 0.9986939610694683,
+      "interpretation": "Uncorrelated-but-dependent and colored-source cases expose limits of a correlation certificate"
+    }
+  ],
+  "information_examples": {
+    "target_and_separator": {
+      "lab": "information",
+      "scope": "Reproduced graph/rank examples; known transfer-function specialization",
+      "excitation": "target_and_separator",
+      "active_excitations": [
+        "x1",
+        "x2"
+      ],
+      "d6": {
+        "disconnecting_set": [
+          "u2"
+        ],
+        "remainder": [
+          "u3",
+          "u4"
+        ],
+        "excluded_excitations": [],
+        "eligible_excitations": [
+          "x1",
+          "x2"
+        ],
+        "required_disjoint_paths": 2,
+        "available_disjoint_paths": 2,
+        "sufficient_condition": true,
+        "reference": "D6 Definitions 4-5 and Corollary 6",
+        "assumptions": "Known graph, independent modules, independent persistently exciting external signals"
+      },
+      "structural": {
+        "full_row_generic_rank": 2,
+        "nuisance_generic_rank": 1,
+        "target_generically_identifiable": true,
+        "whole_row_generically_identifiable": false,
+        "reference": "D4 Proposition 3; independent modules and admissible excitations"
+      },
+      "d4_paper_example": {
+        "full_row_generic_rank": 2,
+        "nuisance_generic_rank": 1,
+        "target_generically_identifiable": true,
+        "whole_row_generically_identifiable": false,
+        "reference": "D4 Proposition 3; independent modules and admissible excitations"
+      },
+      "finite_regression_analogue": {
+        "rank": 2,
+        "columns": 3,
+        "nuisance_rank": 1,
+        "target_rank_increment": 1,
+        "target_identifiable_in_finite_model": true,
+        "whole_design_identifiable": false
+      },
+      "minimum_target_spectral_eigenvalue": 0.6033031533818098,
+      "target_transfer_rank_condition_all_grid_points": true,
+      "spectral_grid": [
+        0.7306925888480011,
+        0.7302851143835483,
+        0.7292985400118202,
+        0.7277380436171517,
+        0.7256121524693113,
+        0.7229331355780444,
+        0.7197174958551982,
+        0.7159865188695407,
+        0.7117668237779098,
+        0.7070908530911453,
+        0.7019972332888854,
+        0.6965309400572857,
+        0.6907432117463999,
+        0.6846911730501899,
+        0.6784371567406204,
+        0.6720477415304653,
+        0.6655925543343425,
+        0.6591429103574271,
+        0.6527703802766952,
+        0.6465453778007575,
+        0.6405358530036728,
+        0.6348061592080594,
+        0.6294161375755585,
+        0.6244204381878597,
+        0.6198680730310533,
+        0.615802177561675,
+        0.6122599447139124,
+        0.6092726883769712,
+        0.6068659917566301,
+        0.6050598984325456,
+        0.603869109055216,
+        0.6033031533818098,
+        0.6033665149025133,
+        0.6040586931423089,
+        0.6053741965884705,
+        0.6073024670315261,
+        0.60982774394945,
+        0.6129288854332902,
+        0.6165791699568506,
+        0.6207461107362738,
+        0.6253913209305973,
+        0.630470472613655,
+        0.6359333941425579,
+        0.6417243479723851,
+        0.6477825229724994,
+        0.6540427612506328,
+        0.6604365196776777,
+        0.6668930422786628,
+        0.6733406943043748,
+        0.6797083860473312,
+        0.6859269985387886,
+        0.6919307176598769,
+        0.6976581896856515,
+        0.7030534292628667,
+        0.7080664373802278,
+        0.7126535174952466,
+        0.7167773076591283,
+        0.7204065710005182,
+        0.7235158036420816,
+        0.7260847272366264,
+        0.7280977336231528,
+        0.7295433434235102,
+        0.730413730868153,
+        0.7307043556823648
+      ],
+      "frequency_grid_count": 64,
+      "paper_references": [
+        "D4 Theorem 2 / Proposition 3 / Figure 1",
+        "D6 Sections 5-7, Theorem 4 and Corollary 6"
+      ],
+      "assumptions": "Independent external white excitation, declared stable input network, independent module parameters; finite frequency checks supplement the graph condition"
+    },
+    "wrong_location": {
+      "lab": "information",
+      "scope": "Reproduced graph/rank examples; known transfer-function specialization",
+      "excitation": "wrong_location",
+      "active_excitations": [
+        "x1",
+        "x3"
+      ],
+      "d6": {
+        "disconnecting_set": [
+          "u2"
+        ],
+        "remainder": [
+          "u3",
+          "u4"
+        ],
+        "excluded_excitations": [
+          "x3"
+        ],
+        "eligible_excitations": [
+          "x1"
+        ],
+        "required_disjoint_paths": 2,
+        "available_disjoint_paths": 1,
+        "sufficient_condition": false,
+        "reference": "D6 Definitions 4-5 and Corollary 6",
+        "assumptions": "Known graph, independent modules, independent persistently exciting external signals"
+      },
+      "structural": {
+        "full_row_generic_rank": 2,
+        "nuisance_generic_rank": 2,
+        "target_generically_identifiable": false,
+        "whole_row_generically_identifiable": false,
+        "reference": "D4 Proposition 3; independent modules and admissible excitations"
+      },
+      "d4_paper_example": {
+        "full_row_generic_rank": 2,
+        "nuisance_generic_rank": 1,
+        "target_generically_identifiable": true,
+        "whole_row_generically_identifiable": false,
+        "reference": "D4 Proposition 3; independent modules and admissible excitations"
+      },
+      "finite_regression_analogue": {
+        "rank": 2,
+        "columns": 3,
+        "nuisance_rank": 1,
+        "target_rank_increment": 1,
+        "target_identifiable_in_finite_model": true,
+        "whole_design_identifiable": false
+      },
+      "minimum_target_spectral_eigenvalue": 0.0,
+      "target_transfer_rank_condition_all_grid_points": false,
+      "spectral_grid": [
+        0.0,
+        1.3877787807814457e-16,
+        2.7755575615628914e-17,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.7755575615628914e-17,
+        0.0,
+        2.7755575615628914e-17,
+        0.0,
+        0.0,
+        2.7755575615628914e-17,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        8.326672684688674e-17,
+        0.0,
+        0.0,
+        0.0,
+        4.163336342344337e-17,
+        0.0,
+        8.326672684688674e-17,
+        6.938893903907228e-17,
+        6.938893903907228e-17,
+        0.0,
+        5.551115123125783e-17,
+        6.938893903907228e-17,
+        6.938893903907228e-17,
+        0.0,
+        0.0,
+        5.551115123125783e-17,
+        0.0,
+        1.3877787807814457e-17,
+        0.0,
+        0.0,
+        0.0,
+        1.3877787807814457e-17,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        5.551115123125783e-17,
+        2.7755575615628914e-17,
+        0.0,
+        2.7755575615628914e-17,
+        2.7755575615628914e-17,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.7755575615628914e-17,
+        0.0,
+        2.7755575615628914e-17,
+        2.7755575615628914e-17,
+        8.326672684688674e-17,
+        1.3877787807814457e-16,
+        0.0,
+        2.7755575615628914e-17,
+        0.0
+      ],
+      "frequency_grid_count": 64,
+      "paper_references": [
+        "D4 Theorem 2 / Proposition 3 / Figure 1",
+        "D6 Sections 5-7, Theorem 4 and Corollary 6"
+      ],
+      "assumptions": "Independent external white excitation, declared stable input network, independent module parameters; finite frequency checks supplement the graph condition"
+    }
+  },
+  "protocol": {
+    "network_seeds": [
+      94000,
+      94079
+    ],
+    "acoustic_seeds": [
+      95000,
+      95044
+    ],
+    "network_samples_per_run": 4096,
+    "projection_order": 12,
+    "acoustic_train_validation_test_independent": true,
+    "source_verification": "Held-out max-correlation circular-shift screen, 99 surrogates, alpha=.01",
+    "scope": "Declared linear-network and synchronized acoustic simulations; no field validation"
+  },
+  "wall_seconds": 16.607
+}

@@ -12,11 +12,13 @@ import onnxruntime as ort
 
 from .physics import inventory_window_score
 from .simulator import FEATURES
+from .context_refinement import ContextRefinement
 
-MODEL_NAMES = ("mass_inventory", "dynamic_residual", "cnn_lstm", "hybrid")
+MODEL_NAMES = ("mass_inventory", "dynamic_residual", "cnn_lstm", "hybrid", "context_refinement")
 MODEL_LABELS = {
     "mass_inventory": "Mass balance", "dynamic_residual": "Dynamic predictor",
     "cnn_lstm": "CNN–LSTM", "hybrid": "Residual hybrid",
+    "context_refinement": "Context refiner",
 }
 
 
@@ -39,6 +41,9 @@ class Runtime:
         if self.lag != self.config["lag"]:
             raise RuntimeError("Dynamic lag does not match the frozen configuration")
         self.window_size = self.config["sequence_length"] + self.lag
+        self.context = ContextRefinement.load(model_dir / "context_refinement.npz")
+        if not all(np.isfinite(v).all() for v in (self.context.refiners, self.context.whiteners)):
+            raise RuntimeError("Invalid context refinement artifact")
         options = ort.SessionOptions()
         options.intra_op_num_threads = options.inter_op_num_threads = 1
         options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
@@ -111,6 +116,7 @@ class Runtime:
                 neural_residual_score / self.config["hybrid_neural_scale"],
                 dynamic_score / self.config["hybrid_dynamic_scale"],
             )
+        scores["context_refinement"] = self.context.score_series(x, times, self.config["sample_s"])
         models = {}
         for name, series in scores.items():
             active, events = self._alarms(series, times, self.config["thresholds"][name])
@@ -118,6 +124,7 @@ class Runtime:
                 "label": MODEL_LABELS[name], "threshold": self.config["thresholds"][name],
                 "scores": [float(s) if np.isfinite(s) else None for s in series],
                 "active": active, "event_times_s": events,
+                "warmup_readings": 2*self.context.window if name == "context_refinement" else self.window_size,
             }
         return {"quality": statuses, "quality_reasons": reasons, "models": models,
                 "attribution": "not_established", "warmup_readings": self.window_size,

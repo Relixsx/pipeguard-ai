@@ -33,8 +33,9 @@ class ApplicationTests(unittest.TestCase):
     def test_example_matches_actual_runtime(self):
         actual = self.runtime.score_series(self.example["readings"], self.example["time_s"])
         for name in MODEL_NAMES:
-            np.testing.assert_allclose(actual["models"][name]["scores"][31:],
-                                       self.example["predictions"]["models"][name]["scores"][31:], rtol=2e-6)
+            a = np.array(actual["models"][name]["scores"], dtype=float)
+            b = np.array(self.example["predictions"]["models"][name]["scores"], dtype=float)
+            np.testing.assert_allclose(a, b, rtol=2e-6, equal_nan=True)
             self.assertEqual(actual["models"][name]["event_times_s"],
                              self.example["predictions"]["models"][name]["event_times_s"])
 
@@ -46,8 +47,8 @@ class ApplicationTests(unittest.TestCase):
         changed[300:, :3] *= 1.02
         full = self.runtime.score_series(changed, times)
         for name in MODEL_NAMES:
-            np.testing.assert_allclose(prefix["models"][name]["scores"][31:],
-                                       full["models"][name]["scores"][31:300], rtol=3e-6)
+            np.testing.assert_allclose(np.array(prefix["models"][name]["scores"], dtype=float),
+                                       np.array(full["models"][name]["scores"][:300], dtype=float), rtol=3e-6, equal_nan=True)
             self.assertEqual(prefix["models"][name]["active"], full["models"][name]["active"][:300])
 
     def test_missing_sensors_restart_warmup(self):
@@ -55,8 +56,9 @@ class ApplicationTests(unittest.TestCase):
         result = self.runtime.score_series(sim["x"], sim["time_s"])
         self.assertEqual(result["quality"].count("data_quality_alert"), 40)
         for name in MODEL_NAMES:
-            self.assertTrue(all(v is None for v in result["models"][name]["scores"][280:351]))
-            self.assertIsNotNone(result["models"][name]["scores"][351])
+            first = 320+result["models"][name]["warmup_readings"]-1
+            self.assertTrue(all(v is None for v in result["models"][name]["scores"][280:first]))
+            self.assertIsNotNone(result["models"][name]["scores"][first])
 
     def test_timestamp_validation_and_gap_reset(self):
         x = self.example["readings"][:100]
@@ -89,7 +91,7 @@ class ApplicationTests(unittest.TestCase):
         self.assertIn("Experiment lab", response.text)
         self.assertIn("script-src 'self'", response.headers["Content-Security-Policy"])
         self.assertEqual(self.client.get("/assets/app.js").status_code, 200)
-        self.assertEqual(self.client.get("/health").json()["models_loaded"], 4)
+        self.assertEqual(self.client.get("/health").json()["models_loaded"], 5)
         docs = self.client.get("/docs")
         self.assertIn("nonce=", docs.text)
         self.assertIn("'nonce-", docs.headers["Content-Security-Policy"])

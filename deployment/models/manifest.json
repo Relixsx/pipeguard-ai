@@ -1,5 +1,5 @@
 {
-  "format": "ONNX",
+  "format": "ONNX and NumPy",
   "opset": 17,
   "seed": 11,
   "torch_version": "2.14.1+cpu",
@@ -56,12 +56,21 @@
       "bytes": 579194
     },
     "config.json": {
-      "sha256": "5d58b37275ecb64cb3e568a36c53adef168acd4fc8c49003334358a17ef8cf25",
-      "bytes": 857
+      "sha256": "fd74767a287dbf69586f4a914d456dac0e598ccce645867bf40d2cf59b452d74",
+      "bytes": 1188
+    },
+    "context_refinement.npz": {
+      "sha256": "d65f8b07eac223ad49c973311efc6f104250927ebe473c58327e2bf03fc73703",
+      "bytes": 7278
+    },
+    "global_refinement_ablation.npz": {
+      "sha256": "ed60c91a994c16932aa3bdfad114f472702e9798d89bb224e7de547508124400",
+      "bytes": 4437
     }
   },
   "checkpoints": {
     "cnn_lstm": "966cb6d8e7fec689e097559aa7ae967898262c3211be8e64fc53af6d3b2d70f5",
     "hybrid": "15c6bad601476dc12e353d9601983383a67548cb2ae2b3217812bbab57915800"
-  }
+  },
+  "context_source": "D9 adapted cluster-refinement; ridge engines; experimental simulation training"
 }

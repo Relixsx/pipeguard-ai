@@ -1,0 +1,2065 @@
+{
+  "protocol": {
+    "scope": "Matched-data ablation on new simulator seeds; no field validation",
+    "test_seed_start": 106000,
+    "test_runs": 66,
+    "minimum_readings_both_models": 60,
+    "same_initial_runs": 40,
+    "same_refinement_runs": 32,
+    "same_calibration_runs": 24,
+    "same_base_forecast": true,
+    "same_ridge_penalty": 10,
+    "same_augmented_features": true,
+    "context_clusters": 3,
+    "global_clusters": 1,
+    "context_threshold": 9.809051589447563,
+    "global_threshold": 8.42050068807864,
+    "global_calibration": {
+      "events": 1,
+      "hours": 22.033333333333328,
+      "alarms_per_hour": 0.04538577912254162
+    },
+    "thresholds_frozen_before_test_generation": true,
+    "global_model_sha256": "ed60c91a994c16932aa3bdfad114f472702e9798d89bb224e7de547508124400",
+    "context_model_sha256": "d65f8b07eac223ad49c973311efc6f104250927ebe473c58327e2bf03fc73703"
+  },
+  "summaries": [
+    {
+      "method": "context_refinement",
+      "leak_events": 36,
+      "detected_events": 27,
+      "false_alarm_events": 4,
+      "healthy_hours": 26.662499999999998,
+      "false_alarms_per_hour": 0.15002344116268168,
+      "zero_false_event_poisson_upper_95_per_hour": null,
+      "median_detected_delay_s": 203.0
+    },
+    {
+      "method": "global_refinement",
+      "leak_events": 36,
+      "detected_events": 26,
+      "false_alarm_events": 4,
+      "healthy_hours": 26.662499999999998,
+      "false_alarms_per_hour": 0.15002344116268168,
+      "zero_false_event_poisson_upper_95_per_hour": null,
+      "median_detected_delay_s": 184.0
+    }
+  ],
+  "run_results": [
+    {
+      "method": "context_refinement",
+      "seed": 106000,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.3111111111111111,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106000,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.3111111111111111,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106001,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 138.0,
+      "false_events": 0,
+      "healthy_hours": 0.24722222222222223,
+      "alarm_times_s": [
+        1320.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106001,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 128.0,
+      "false_events": 0,
+      "healthy_hours": 0.24722222222222223,
+      "alarm_times_s": [
+        1310.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106002,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 2,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.23055555555555557,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106002,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 2,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.23055555555555557,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106003,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.24166666666666667,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106003,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.24166666666666667,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106004,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 36.0,
+      "false_events": 0,
+      "healthy_hours": 0.2708333333333333,
+      "alarm_times_s": [
+        1305.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106004,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 31.0,
+      "false_events": 0,
+      "healthy_hours": 0.2708333333333333,
+      "alarm_times_s": [
+        1300.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106005,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 115.0,
+      "false_events": 0,
+      "healthy_hours": 0.32916666666666666,
+      "alarm_times_s": [
+        1595.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106005,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 110.0,
+      "false_events": 0,
+      "healthy_hours": 0.32916666666666666,
+      "alarm_times_s": [
+        1590.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106006,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 79.0,
+      "false_events": 0,
+      "healthy_hours": 0.2986111111111111,
+      "alarm_times_s": [
+        1445.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106006,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 69.0,
+      "false_events": 0,
+      "healthy_hours": 0.2986111111111111,
+      "alarm_times_s": [
+        1435.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106007,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 21.0,
+      "false_events": 0,
+      "healthy_hours": 0.25833333333333336,
+      "alarm_times_s": [
+        1245.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106007,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 21.0,
+      "false_events": 0,
+      "healthy_hours": 0.25833333333333336,
+      "alarm_times_s": [
+        1245.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106008,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 42.0,
+      "false_events": 0,
+      "healthy_hours": 0.2833333333333333,
+      "alarm_times_s": [
+        1355.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106008,
+      "kind": "leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 37.0,
+      "false_events": 0,
+      "healthy_hours": 0.2833333333333333,
+      "alarm_times_s": [
+        1350.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106009,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.30277777777777776,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106009,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.30277777777777776,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106010,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 673.0,
+      "false_events": 0,
+      "healthy_hours": 0.32222222222222224,
+      "alarm_times_s": [
+        2125.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106010,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 623.0,
+      "false_events": 0,
+      "healthy_hours": 0.32222222222222224,
+      "alarm_times_s": [
+        2075.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106011,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 2,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.26666666666666666,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106011,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.02,
+      "location": 2,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.26666666666666666,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106012,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.3055555555555556,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106012,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.3055555555555556,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106013,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 315.0,
+      "false_events": 0,
+      "healthy_hours": 0.24583333333333332,
+      "alarm_times_s": [
+        1490.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106013,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 300.0,
+      "false_events": 0,
+      "healthy_hours": 0.24583333333333332,
+      "alarm_times_s": [
+        1475.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106014,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 576.0,
+      "false_events": 0,
+      "healthy_hours": 0.2777777777777778,
+      "alarm_times_s": [
+        1870.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106014,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.05,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 571.0,
+      "false_events": 0,
+      "healthy_hours": 0.2777777777777778,
+      "alarm_times_s": [
+        1865.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106015,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 437.0,
+      "false_events": 0,
+      "healthy_hours": 0.23333333333333334,
+      "alarm_times_s": [
+        1570.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106015,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 417.0,
+      "false_events": 0,
+      "healthy_hours": 0.23333333333333334,
+      "alarm_times_s": [
+        1550.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106016,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 190.0,
+      "false_events": 0,
+      "healthy_hours": 0.30416666666666664,
+      "alarm_times_s": [
+        1575.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106016,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 185.0,
+      "false_events": 0,
+      "healthy_hours": 0.30416666666666664,
+      "alarm_times_s": [
+        1570.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106017,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 330.0,
+      "false_events": 0,
+      "healthy_hours": 0.2375,
+      "alarm_times_s": [
+        1475.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106017,
+      "kind": "gradual_leak",
+      "regime": "in_range",
+      "leak_fraction": 0.1,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 330.0,
+      "false_events": 0,
+      "healthy_hours": 0.2375,
+      "alarm_times_s": [
+        1475.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106018,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.2777777777777778,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106018,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.2777777777777778,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106019,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 88.0,
+      "false_events": 0,
+      "healthy_hours": 0.325,
+      "alarm_times_s": [
+        1550.0,
+        1895.0,
+        2720.0,
+        3310.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106019,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 68.0,
+      "false_events": 0,
+      "healthy_hours": 0.325,
+      "alarm_times_s": [
+        1530.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106020,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 1385.0,
+      "false_events": 0,
+      "healthy_hours": 0.2791666666666667,
+      "alarm_times_s": [
+        2685.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106020,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 2,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 1,
+      "healthy_hours": 0.2791666666666667,
+      "alarm_times_s": [
+        315.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106021,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 1151.0,
+      "false_events": 0,
+      "healthy_hours": 0.3013888888888889,
+      "alarm_times_s": [
+        2530.0,
+        3150.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106021,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 1486.0,
+      "false_events": 0,
+      "healthy_hours": 0.3013888888888889,
+      "alarm_times_s": [
+        2865.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106022,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 35.0,
+      "false_events": 0,
+      "healthy_hours": 0.2833333333333333,
+      "alarm_times_s": [
+        1350.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106022,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 30.0,
+      "false_events": 0,
+      "healthy_hours": 0.2833333333333333,
+      "alarm_times_s": [
+        1345.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106023,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 115.0,
+      "false_events": 0,
+      "healthy_hours": 0.3125,
+      "alarm_times_s": [
+        1535.0,
+        2545.0,
+        2950.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106023,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 105.0,
+      "false_events": 1,
+      "healthy_hours": 0.3125,
+      "alarm_times_s": [
+        995.0,
+        1525.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106024,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 63.0,
+      "false_events": 1,
+      "healthy_hours": 0.3194444444444444,
+      "alarm_times_s": [
+        735.0,
+        1505.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106024,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 68.0,
+      "false_events": 0,
+      "healthy_hours": 0.3194444444444444,
+      "alarm_times_s": [
+        1510.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106025,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 20.0,
+      "false_events": 0,
+      "healthy_hours": 0.33055555555555555,
+      "alarm_times_s": [
+        1505.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106025,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 20.0,
+      "false_events": 0,
+      "healthy_hours": 0.33055555555555555,
+      "alarm_times_s": [
+        1505.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106026,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 41.0,
+      "false_events": 0,
+      "healthy_hours": 0.3138888888888889,
+      "alarm_times_s": [
+        1465.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106026,
+      "kind": "leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 41.0,
+      "false_events": 0,
+      "healthy_hours": 0.3138888888888889,
+      "alarm_times_s": [
+        1465.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106027,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.2569444444444444,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106027,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 0,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.2569444444444444,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106028,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 615.0,
+      "false_events": 0,
+      "healthy_hours": 0.2625,
+      "alarm_times_s": [
+        1850.0,
+        2605.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106028,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 580.0,
+      "false_events": 0,
+      "healthy_hours": 0.2625,
+      "alarm_times_s": [
+        1815.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106029,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 2,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.3125,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106029,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.02,
+      "location": 2,
+      "leak_case": true,
+      "detected": false,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.3125,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106030,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 387.0,
+      "false_events": 0,
+      "healthy_hours": 0.28055555555555556,
+      "alarm_times_s": [
+        1690.0,
+        2415.0,
+        3110.0,
+        3235.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106030,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 797.0,
+      "false_events": 0,
+      "healthy_hours": 0.28055555555555556,
+      "alarm_times_s": [
+        2100.0,
+        2415.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106031,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 363.0,
+      "false_events": 0,
+      "healthy_hours": 0.2638888888888889,
+      "alarm_times_s": [
+        1605.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106031,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 318.0,
+      "false_events": 0,
+      "healthy_hours": 0.2638888888888889,
+      "alarm_times_s": [
+        1560.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106032,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 632.0,
+      "false_events": 0,
+      "healthy_hours": 0.24305555555555555,
+      "alarm_times_s": [
+        1800.0,
+        3415.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106032,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.05,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 562.0,
+      "false_events": 0,
+      "healthy_hours": 0.24305555555555555,
+      "alarm_times_s": [
+        1730.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106033,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 558.0,
+      "false_events": 0,
+      "healthy_hours": 0.2569444444444444,
+      "alarm_times_s": [
+        1775.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106033,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 0,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 468.0,
+      "false_events": 0,
+      "healthy_hours": 0.2569444444444444,
+      "alarm_times_s": [
+        1685.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106034,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 203.0,
+      "false_events": 0,
+      "healthy_hours": 0.28888888888888886,
+      "alarm_times_s": [
+        1535.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106034,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 1,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 183.0,
+      "false_events": 0,
+      "healthy_hours": 0.28888888888888886,
+      "alarm_times_s": [
+        1515.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106035,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 330.0,
+      "false_events": 0,
+      "healthy_hours": 0.2625,
+      "alarm_times_s": [
+        1565.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106035,
+      "kind": "gradual_leak",
+      "regime": "shifted",
+      "leak_fraction": 0.1,
+      "location": 2,
+      "leak_case": true,
+      "detected": true,
+      "delay_s": 325.0,
+      "false_events": 0,
+      "healthy_hours": 0.2625,
+      "alarm_times_s": [
+        1560.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106036,
+      "kind": "healthy",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106036,
+      "kind": "healthy",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106037,
+      "kind": "healthy",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106037,
+      "kind": "healthy",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106038,
+      "kind": "healthy",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106038,
+      "kind": "healthy",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106039,
+      "kind": "healthy",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 1,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": [
+        3370.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106039,
+      "kind": "healthy",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 2,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": [
+        565.0,
+        3370.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106040,
+      "kind": "healthy",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106040,
+      "kind": "healthy",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106041,
+      "kind": "healthy",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106041,
+      "kind": "healthy",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106042,
+      "kind": "normal_transient",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106042,
+      "kind": "normal_transient",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106043,
+      "kind": "normal_transient",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 1,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": [
+        1260.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106043,
+      "kind": "normal_transient",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106044,
+      "kind": "normal_transient",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106044,
+      "kind": "normal_transient",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106045,
+      "kind": "normal_transient",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 1,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": [
+        1210.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106045,
+      "kind": "normal_transient",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106046,
+      "kind": "normal_transient",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106046,
+      "kind": "normal_transient",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106047,
+      "kind": "normal_transient",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106047,
+      "kind": "normal_transient",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106048,
+      "kind": "weak_excitation",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106048,
+      "kind": "weak_excitation",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106049,
+      "kind": "weak_excitation",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106049,
+      "kind": "weak_excitation",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106050,
+      "kind": "weak_excitation",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106050,
+      "kind": "weak_excitation",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106051,
+      "kind": "weak_excitation",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106051,
+      "kind": "weak_excitation",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106052,
+      "kind": "weak_excitation",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106052,
+      "kind": "weak_excitation",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106053,
+      "kind": "weak_excitation",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106053,
+      "kind": "weak_excitation",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.9180555555555555,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106054,
+      "kind": "sensor_bias",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1270.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106054,
+      "kind": "sensor_bias",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1265.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106055,
+      "kind": "sensor_bias",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1265.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106055,
+      "kind": "sensor_bias",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1260.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106056,
+      "kind": "sensor_bias",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1270.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106056,
+      "kind": "sensor_bias",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1265.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106057,
+      "kind": "sensor_bias",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1270.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106057,
+      "kind": "sensor_bias",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1265.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106058,
+      "kind": "sensor_bias",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1270.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106058,
+      "kind": "sensor_bias",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1265.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106059,
+      "kind": "sensor_bias",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1250.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106059,
+      "kind": "sensor_bias",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1240.0
+      ]
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106060,
+      "kind": "missing_sensor",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106060,
+      "kind": "missing_sensor",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106061,
+      "kind": "missing_sensor",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        2330.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106061,
+      "kind": "missing_sensor",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106062,
+      "kind": "missing_sensor",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106062,
+      "kind": "missing_sensor",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106063,
+      "kind": "missing_sensor",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106063,
+      "kind": "missing_sensor",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 0,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106064,
+      "kind": "missing_sensor",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106064,
+      "kind": "missing_sensor",
+      "regime": "in_range",
+      "leak_fraction": 0.0,
+      "location": 1,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": []
+    },
+    {
+      "method": "context_refinement",
+      "seed": 106065,
+      "kind": "missing_sensor",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1930.0
+      ]
+    },
+    {
+      "method": "global_refinement",
+      "seed": 106065,
+      "kind": "missing_sensor",
+      "regime": "shifted",
+      "leak_fraction": 0.0,
+      "location": 2,
+      "leak_case": false,
+      "detected": null,
+      "delay_s": null,
+      "false_events": 0,
+      "healthy_hours": 0.0,
+      "alarm_times_s": [
+        1930.0
+      ]
+    }
+  ],
+  "paired_leak_detection": {
+    "context_only": 1,
+    "global_only": 0,
+    "two_sided_exact_mcnemar_p": 1.0,
+    "interpretation": "Paired fixed cohort comparison; does not establish field superiority"
+  }
+}
